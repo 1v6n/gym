@@ -1,117 +1,116 @@
-# 🏋️ Hypertrophy DDP Coach
+# Hypertrophy DDP Coach
 
-An evidence-based, 4-day Upper/Lower natural hypertrophy training web application and Progressive Web App (PWA). Powered by Dynamic Double Progression (DDP), biomechanical execution cues, intelligent fatigue drop-off detection, and zero-dependency offline storage.
+A 4-day upper/lower workout tracker built as an offline Progressive Web App (PWA). It implements Dynamic Double Progression (DDP) to regulate load and volume, with exercise cues, a rest timer, and local data storage.
 
-Designed with modern typography and Dusk tokens adhering to strict design standards (WCAG 2.1 AA accessible, >=44px touch targets, zero AI-slop).
+Built with semantic HTML, modern CSS tokens (Dusk theme, WCAG 2.1 AA contrast, 44px touch targets), and vanilla JavaScript. No database, account, or cloud dependency.
 
 ---
 
-## 🚀 1-Minute Deployment to GitHub Pages
+## Deployment to GitHub Pages
 
-GitHub Pages is the easiest, fastest way to host this app with free, automatic HTTPS:
+GitHub Pages serves the static app over HTTPS, which iOS and Android require for home screen installation:
 
-1. **Create a GitHub Repository**:
+1. **Push to GitHub**:
    ```bash
    git init
    git add .
-   git commit -m "Initial commit: Hypertrophy DDP Coach PWA"
+   git commit -m "Initial commit"
    git branch -M main
-   git remote add origin https://github.com/<YOUR_USERNAME>/<YOUR_REPO_NAME>.git
+   git remote add origin git@github.com:<YOUR_USERNAME>/<YOUR_REPO_NAME>.git
    git push -u origin main
    ```
-2. **Enable GitHub Pages**:
+2. **Enable Pages**:
    - Go to your repository on GitHub.
-   - Click **Settings** → **Pages** (in the left sidebar).
-   - Under **Build and deployment** > **Source**, select **Deploy from a branch**.
-   - Under **Branch**, select `main` and `/ (root)`, then click **Save**.
-3. **Open on your Phone**:
-   - In 1–2 minutes, GitHub will publish your site at `https://<YOUR_USERNAME>.github.io/<YOUR_REPO_NAME>/`.
-   - Open that URL on your phone's browser (Safari on iOS or Chrome on Android).
-   - Tap **Share** → **Add to Home Screen** (iOS) or **Menu** → **Install App** (Android).
-   - The app installs as a standalone fullscreen app that works 100% offline at the gym!
+   - Click **Settings** -> **Pages**.
+   - Under **Build and deployment** > **Source**, choose **Deploy from a branch**.
+   - Select branch `main` and folder `/ (root)`, then click **Save**.
+3. **Install on Phone**:
+   - Open `https://<YOUR_USERNAME>.github.io/<YOUR_REPO_NAME>/` in Safari (iOS) or Chrome (Android).
+   - Tap **Share** -> **Add to Home Screen** (iOS) or **Menu** -> **Install App** (Android).
+   - The app runs fullscreen and works offline.
 
 ---
 
-## 📱 Features
+## Features
 
-* **Scientific 4-Day Split**:
-  * **Upper A**: Horizontal Push & Vertical Pull (Flat DB Press, Lat Pulldown, Incline DB, Chest-Supported Row, Cable Lateral Raise, Overhead Triceps Extension, Incline Biceps Curl).
-  * **Lower A**: Quad Bias & Knee Flexion (Leg Press, Romanian Deadlift, Leg Extension, Seated Leg Curl, Standing Calf Raise).
-  * **Upper B**: Vertical Push & Horizontal Pull (Overhead DB Press, Chest-Supported T-Bar Row, Flat DB Bench, Neutral Grip Pulldown, DB Lateral Raise, Cross-Body Triceps Extension, Bayesian Cable Curl).
-  * **Lower B**: Posterior Chain & Adductor Focus (Barbell RDL, Hack Squat / Leg Press, Lying Leg Curl, Machine Hip Adduction, Seated Calf Raise).
-* **Dynamic Double Progression (DDP) Engine**:
-  * **Set 1 Ceiling Trigger**: Reaching the top of the rep target bracket (e.g. 8 reps on 6–8) prompts an automated load increase recommendation (+2.5% to +5%) for the next week.
-  * **Fatigue Drop-off Warning**: Falling below the target bracket floor on subsequent sets prompts an immediate fatigue reduction recommendation (-5% to -10%) to preserve high-threshold motor unit recruitment without junk volume.
-* **Smart Rest Timer**:
-  * Auto-starts when sets are completed with exercise-specific rest intervals (2.0 to 3.5 min for compounds; 1.5 to 2.0 min for isolations).
-  * +30s / -30s adjustments, pause/resume, and hardware-accelerated progress bar.
-  * Web Audio API synthesized completion chime and haptic vibration pattern (`[200, 100, 200, 100, 400]ms`).
-* **Deload Mode**:
-  * One-tap switch reducing volume by ~50% and setting target intensity to 3–4 RIR for scheduled recovery weeks.
-* **100% Offline & Private**:
-  * Built on `localStorage` and Service Worker (`sw.js`). No database, no tracking, no external login required.
-  * Single-tap JSON backup import/export and formatted Markdown clipboard export.
+- **4-Day Split**:
+  - **Upper A**: Horizontal Push and Vertical Pull (Flat DB Press, Lat Pulldown, Incline DB, Chest-Supported Row, Cable Lateral Raise, Overhead Triceps Extension, Incline Biceps Curl).
+  - **Lower A**: Quad Bias and Knee Flexion (Leg Press, Romanian Deadlift, Leg Extension, Seated Leg Curl, Standing Calf Raise).
+  - **Upper B**: Vertical Push and Horizontal Pull (Overhead DB Press, Chest-Supported T-Bar Row, Flat DB Bench, Neutral Grip Pulldown, DB Lateral Raise, Cross-Body Triceps Extension, Bayesian Cable Curl).
+  - **Lower B**: Posterior Chain and Adductors (Barbell RDL, Hack Squat / Leg Press, Lying Leg Curl, Machine Hip Adduction, Seated Calf Raise).
+- **Dynamic Double Progression (DDP)**:
+  - **Set 1 ceiling**: Reaching the top of the rep bracket (e.g. 8 reps on a 6–8 target) prompts a 2.5% to 5% load increase for the next week.
+  - **Fatigue floor**: Dropping below the rep floor on later sets prompts an immediate 5% to 10% load reduction for the next set.
+- **Rest Timer**:
+  - Starts on set completion with exercise-specific intervals (2 to 3.5 minutes for compounds; 1.5 to 2 minutes for isolations).
+  - Web Audio synthesis chime and haptic vibration pattern on completion.
+  - +30s / -30s adjustments, pause, and skip controls.
+- **Deload Switch**:
+  - One-tap toggle that cuts volume by 50% and sets targets to 3–4 RIR.
+- **Data Privacy**:
+  - Data stays in browser `localStorage`.
+  - JSON backup import/export and formatted Markdown clipboard export.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 gym/
-├── index.html                   # Main PWA application entry point (GitHub Pages root)
-├── manifest.json                # Web App Manifest for mobile installation
-├── sw.js                        # Service Worker for full offline caching (v4)
-├── README.md                    # Project documentation & GitHub Pages guide
-├── .gitignore                   # Excluded build and local cache files
+├── index.html                   # Application entry point (GitHub Pages root)
+├── manifest.json                # PWA manifest
+├── sw.js                        # Service Worker (offline cache v4)
+├── README.md                    # Project documentation
+├── .gitignore                   # Excluded build and cache files
 │
-├── assets/                      # Production frontend assets
+├── assets/                      # Frontend assets
 │   ├── css/
-│   │   ├── tokens.css           # OKLCH design tokens (colors, spacing, typography)
-│   │   ├── base.css             # CSS reset & typography baseline
-│   │   └── styles.css           # Responsive Dusk layout and component styles
+│   │   ├── tokens.css           # Design tokens (OKLCH colors, spacing, typography)
+│   │   ├── base.css             # CSS reset and typography base
+│   │   └── styles.css           # Component layouts and Dusk theme
 │   ├── js/
-│   │   └── app.js               # Routine data, DDP progression engine, timer & state
+│   │   └── app.js               # Workout routine, DDP engine, timer, and state
 │   └── icons/
-│       └── icon.svg             # PWA vector icon and apple-touch-icon
+│       └── icon.svg             # Vector app icon
 │
 ├── docs/                        # Reference documentation
-│   ├── routine.md               # Evidence-based training principles and anatomy breakdown
-│   ├── workout_log.md           # Markdown workout logging template
-│   └── OPEN_SOURCE_COMPARISON.md# Comprehensive benchmark vs existing open-source trackers
+│   ├── routine.md               # Training principles and exercise details
+│   ├── workout_log.md           # Markdown logging template
+│   └── OPEN_SOURCE_COMPARISON.md# Comparison against existing open-source trackers
 │
-├── scripts/                     # Local developer utilities
-│   └── serve.py                 # Lightweight Wi-Fi development server
+├── scripts/                     # Local utilities
+│   └── serve.py                 # Local Wi-Fi development server
 │
-└── tests/                       # Automated Playwright QA & visual regression suite
-    ├── qa_runner.py             # Synchronous Playwright functional E2E runner (30 tests)
-    ├── run_qa.py                # Multi-viewport responsive visual & contrast test suite
-    └── screenshots/             # 41 visual test captures & machine-readable audit report
+└── tests/                       # Playwright test suite
+    ├── qa_runner.py             # 30 functional E2E tests
+    ├── run_qa.py                # Viewport, contrast, and touch target checks
+    └── screenshots/             # Test captures and machine audit log
 ```
 
 ---
 
-## 💻 Local Development & Testing
+## Local Development and Testing
 
-### Running the Local Server
+### Run Local Server
 ```bash
-# Using UV
+# With UV
 uv run python scripts/serve.py
 
-# Or standard Python 3
+# With standard Python
 python3 scripts/serve.py
 ```
-Access at `http://localhost:8080` (or the printed local Wi-Fi IP from your mobile phone).
+Open `http://localhost:8080` or the local Wi-Fi IP shown in the console.
 
-### Running Automated Playwright QA
+### Run Tests
 ```bash
-# Run all 30 functional E2E tests
+# Functional tests
 uv run python tests/qa_runner.py
 
-# Run responsive visual audits (Desktop, iPhone, Android, 320px)
+# Multi-viewport and accessibility checks
 uv run python tests/run_qa.py
 ```
 
 ---
 
-## 📄 License
-MIT License. Free to use, modify, and share.
+## License
+MIT
