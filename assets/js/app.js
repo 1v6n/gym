@@ -549,7 +549,8 @@ const ROUTINE_DATA = {
 const STORAGE_KEYS = {
   LOGS: 'hypertrophy_ddp_logs_v2',
   SETTINGS: 'hypertrophy_ddp_settings_v2',
-  ACTIVE_DRAFT: 'hypertrophy_ddp_active_draft_v2'
+  ACTIVE_DRAFT: 'hypertrophy_ddp_active_draft_v2',
+  HISTORY: 'hypertrophy_ddp_history_v1'
 };
 
 const state = {
@@ -561,33 +562,34 @@ const state = {
   isDeloadMode: false,
   audioVibrate: true,
   logs: {},
-  draft: {}
+  history: [],
+  draft: {},
+  audioCtx: null
 };
 
 // Web Audio API Synth Sound
-let audioCtx = null;
 function playBeep(freq = 587.33, duration = 0.15, type = 'sine') {
   if (!state.audioVibrate) return;
   try {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return;
-    if (!audioCtx) audioCtx = new AudioContextClass();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!state.audioCtx) state.audioCtx = new AudioContextClass();
+    if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
 
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const osc = state.audioCtx.createOscillator();
+    const gain = state.audioCtx.createGain();
 
     osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
 
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    gain.gain.setValueAtTime(0.12, state.audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, state.audioCtx.currentTime + duration);
 
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(state.audioCtx.destination);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    osc.stop(state.audioCtx.currentTime + duration);
   } catch (e) {
     console.warn('Audio play failed', e);
   }
@@ -600,7 +602,19 @@ function playCompletionChime() {
   if (state.audioVibrate && 'vibrate' in navigator) {
     try {
       navigator.vibrate([200, 100, 200, 100, 400]);
-    } catch (_) {}
+    } catch (err) {
+      console.debug('Haptics vibrate unavailable:', err);
+    }
+  }
+}
+
+function saveStorageItem(key, value) {
+  try {
+    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+    return true;
+  } catch (err) {
+    console.error(`Error saving to localStorage key "${key}":`, err);
+    return false;
   }
 }
 
@@ -608,6 +622,14 @@ function loadState() {
   try {
     const savedLogs = localStorage.getItem(STORAGE_KEYS.LOGS);
     if (savedLogs) state.logs = JSON.parse(savedLogs);
+
+    const savedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
+    if (savedHistory) {
+      const parsedHistory = JSON.parse(savedHistory);
+      state.history = Array.isArray(parsedHistory) ? parsedHistory : [];
+    } else {
+      state.history = [];
+    }
 
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     if (savedSettings) {
@@ -633,35 +655,27 @@ function loadState() {
 }
 
 function saveLogs() {
-  try {
-    localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(state.logs));
-  } catch (e) {
-    console.error('Save logs error', e);
-  }
+  saveStorageItem(STORAGE_KEYS.LOGS, state.logs);
+}
+
+function saveHistory() {
+  saveStorageItem(STORAGE_KEYS.HISTORY, state.history);
 }
 
 function saveSettings() {
-  try {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({
-      weightUnit: state.weightUnit,
-      isDeloadMode: state.isDeloadMode,
-      audioVibrate: state.audioVibrate
-    }));
-  } catch (e) {
-    console.error('Save settings error', e);
-  }
+  saveStorageItem(STORAGE_KEYS.SETTINGS, {
+    weightUnit: state.weightUnit,
+    isDeloadMode: state.isDeloadMode,
+    audioVibrate: state.audioVibrate
+  });
 }
 
 function saveDraft() {
-  try {
-    state.draft.isWorkoutActive = state.isWorkoutActive;
-    state.draft.activeWorkoutSessionId = state.activeWorkoutSessionId;
-    state.draft.workoutStartTime = state.workoutStartTime;
-    state.draft.currentSessionId = state.currentSessionId;
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_DRAFT, JSON.stringify(state.draft));
-  } catch (e) {
-    console.error('Save draft error', e);
-  }
+  state.draft.isWorkoutActive = state.isWorkoutActive;
+  state.draft.activeWorkoutSessionId = state.activeWorkoutSessionId;
+  state.draft.workoutStartTime = state.workoutStartTime;
+  state.draft.currentSessionId = state.currentSessionId;
+  saveStorageItem(STORAGE_KEYS.ACTIVE_DRAFT, state.draft);
 }
 
 // ============================================================================
@@ -1223,6 +1237,15 @@ function setupGlobalListeners() {
   }
 
   const btnExportJson = document.getElementById('btnExportJson');
+  const btnHistory = document.getElementById('btnHistory');
+  const modalHistory = document.getElementById('modalHistory');
+  if (btnHistory && modalHistory) {
+    btnHistory.onclick = () => {
+      renderHistoryModal();
+      modalHistory.classList.remove('hidden');
+    };
+  }
+
   if (btnExportJson) {
     btnExportJson.onclick = () => exportJsonBackup();
   }
@@ -1237,10 +1260,13 @@ function setupGlobalListeners() {
     btnResetHistory.onclick = () => {
       if (confirm('Estas seguro de que deseas borrar el historial de entrenamientos guardados?')) {
         state.logs = {};
+        state.history = [];
         state.draft = {};
         saveLogs();
+        saveHistory();
         saveDraft();
         renderSession();
+        renderHistoryModal();
         alert('Historial borrado.');
       }
     };
@@ -1252,9 +1278,18 @@ function finishWorkoutSession() {
   const session = ROUTINE_DATA[sessionIdToFinish];
   if (!session) return;
 
+  const now = Date.now();
   const completedSession = {
-    timestamp: Date.now(),
+    id: `workout_${now}_${session.id}`,
+    sessionId: session.id,
+    sessionTitle: session.title,
+    dayName: session.dayName,
+    timestamp: now,
     dateString: new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }),
+    displayDate: new Date().toLocaleDateString('es-ES', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    weightUnit: state.weightUnit,
+    isDeloadMode: state.isDeloadMode,
+    durationMinutes: state.workoutStartTime ? Math.max(1, Math.round((now - state.workoutStartTime) / 60000)) : 0,
     exercises: {}
   };
 
@@ -1277,6 +1312,10 @@ function finishWorkoutSession() {
   state.logs[session.id] = completedSession;
   saveLogs();
 
+  if (!Array.isArray(state.history)) state.history = [];
+  state.history.unshift(completedSession);
+  saveHistory();
+
   state.isWorkoutActive = false;
   state.activeWorkoutSessionId = null;
   state.workoutStartTime = null;
@@ -1288,9 +1327,189 @@ function finishWorkoutSession() {
 
   stopRestTimer();
   renderSession();
+  renderHistoryModal();
   playCompletionChime();
 
   alert(`Entrenamiento ${session.name} finalizado y registrado.`);
+}
+
+function renderHistoryModal() {
+  const container = document.getElementById('historyModalBody');
+  if (!container) return;
+
+  if (!state.history || state.history.length === 0) {
+    container.innerHTML = `
+      <div class="history-empty">
+        <div class="history-empty-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <p class="history-empty-title">Sin entrenamientos registrados</p>
+        <p class="history-empty-desc">Completa una sesion para guardarla en tu historial y ver tu progreso.</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '<div class="history-list">';
+  state.history.forEach((h) => {
+    let totalCompletedSets = 0;
+    let topSetSummary = '';
+
+    if (h.exercises) {
+      Object.keys(h.exercises).forEach(exId => {
+        const sets = h.exercises[exId] || [];
+        sets.forEach(s => {
+          if (s.done || (s.reps > 0 && s.weight > 0)) {
+            totalCompletedSets++;
+          }
+        });
+      });
+    }
+
+    const sessionObj = ROUTINE_DATA[h.sessionId];
+    const firstEx = sessionObj?.exercises?.[0];
+    if (firstEx && h.exercises?.[firstEx.id]?.[0]) {
+      const topSet = h.exercises[firstEx.id][0];
+      if (topSet.reps > 0) {
+        topSetSummary = `${firstEx.name}: ${topSet.weight}${h.weightUnit || 'kg'} × ${topSet.reps} reps`;
+      }
+    }
+
+    html += `
+      <div class="history-card" data-history-id="${h.id}">
+        <div class="history-card-header">
+          <div>
+            <div class="history-card-title-row">
+              <span class="history-card-title">${h.sessionTitle || h.sessionId}</span>
+              ${h.isDeloadMode ? '<span class="history-badge deload">Deload</span>' : ''}
+            </div>
+            <span class="history-card-date">${h.displayDate || h.dateString || new Date(h.timestamp).toLocaleDateString()}</span>
+          </div>
+          <div class="history-header-meta">
+            <span class="history-meta-pill">${h.durationMinutes ? `${h.durationMinutes} min` : `${totalCompletedSets} series`}</span>
+          </div>
+        </div>
+        ${topSetSummary ? `<div class="history-card-date"><strong>Top set:</strong> ${topSetSummary}</div>` : ''}
+
+        <div class="history-card-details hidden" id="historyDetails_${h.id}">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Ejercicio</th>
+                <th>Serie</th>
+                <th>Carga (${h.weightUnit || 'kg'})</th>
+                <th>Reps</th>
+                <th>RIR</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (sessionObj) {
+      sessionObj.exercises.forEach(ex => {
+        const loggedSets = h.exercises?.[ex.id] || [];
+        loggedSets.forEach((s, idx) => {
+          html += `
+            <tr>
+              <td>${idx === 0 ? ex.name : ''}</td>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center;">${s.weight || '—'}</td>
+              <td style="text-align:center;">${s.reps || '—'}</td>
+              <td style="text-align:center;">${s.rir !== undefined ? s.rir : '—'}</td>
+            </tr>
+          `;
+        });
+      });
+    }
+
+    html += `
+            </tbody>
+          </table>
+        </div>
+
+        <div class="history-card-actions">
+          <button class="btn-history-action btn-toggle-detail" data-toggle-history="${h.id}">
+            Ver detalle
+          </button>
+          <button class="btn-history-action btn-copy-md" data-copy-history="${h.id}" title="Copiar resumen en Markdown">
+            Copiar Markdown
+          </button>
+          <button class="btn-history-action btn-history-delete" data-delete-history="${h.id}" title="Eliminar este entrenamiento">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-toggle-history]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-toggle-history');
+      const details = document.getElementById(`historyDetails_${id}`);
+      if (details) {
+        const isHidden = details.classList.toggle('hidden');
+        btn.textContent = isHidden ? 'Ver detalle' : 'Ocultar detalle';
+      }
+    };
+  });
+
+  container.querySelectorAll('[data-copy-history]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-copy-history');
+      exportSingleHistoryMarkdown(id);
+    };
+  });
+
+  container.querySelectorAll('[data-delete-history]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-delete-history');
+      deleteHistoryEntry(id);
+    };
+  });
+}
+
+function exportSingleHistoryMarkdown(id) {
+  const item = state.history.find(h => h.id === id);
+  if (!item) return;
+
+  const session = ROUTINE_DATA[item.sessionId];
+  let md = `### Sesion: ${item.sessionTitle || session?.title || item.sessionId}\n`;
+  md += `**Fecha:** ${item.displayDate || item.dateString} | **Unidad:** ${item.weightUnit || 'kg'}${item.isDeloadMode ? ' | **Modo Deload**' : ''}\n\n`;
+  md += `| Ejercicio | Serie | Carga (${item.weightUnit || 'kg'}) | Reps | RIR |\n`;
+  md += `| :--- | :---: | :---: | :---: | :---: |\n`;
+
+  if (session) {
+    session.exercises.forEach(ex => {
+      const sets = item.exercises?.[ex.id] || [];
+      sets.forEach((s, idx) => {
+        md += `| ${ex.name} | ${idx + 1} | ${s.weight || '—'} | ${s.reps || '—'} | ${s.rir !== undefined ? s.rir : '—'} |\n`;
+      });
+    });
+  }
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(md).then(() => {
+      alert('Resumen del entrenamiento copiado al portapapeles.');
+    }).catch(() => {
+      prompt('Copia tu resumen markdown:', md);
+    });
+  } else {
+    prompt('Copia tu resumen markdown:', md);
+  }
+}
+
+function deleteHistoryEntry(id) {
+  if (confirm('Estas seguro de eliminar este entrenamiento del historial?')) {
+    state.history = state.history.filter(h => h.id !== id);
+    saveHistory();
+    renderHistoryModal();
+  }
 }
 
 function exportWorkoutMarkdown() {
@@ -1337,8 +1556,9 @@ function exportWorkoutMarkdown() {
 
 function exportJsonBackup() {
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({
-    version: 2,
+    version: 3,
     timestamp: Date.now(),
+    history: state.history,
     logs: state.logs,
     settings: {
       weightUnit: state.weightUnit,
@@ -1363,6 +1583,10 @@ function importJsonBackup(event) {
   reader.onload = (e) => {
     try {
       const imported = JSON.parse(e.target.result);
+      if (imported.history && Array.isArray(imported.history)) {
+        state.history = imported.history;
+        saveHistory();
+      }
       if (imported.logs) {
         state.logs = imported.logs;
         saveLogs();
@@ -1374,6 +1598,7 @@ function importJsonBackup(event) {
         saveSettings();
       }
       renderSession();
+      renderHistoryModal();
       alert('Respaldo restaurado correctamente.');
     } catch (err) {
       alert('Error al procesar el archivo JSON de respaldo.');

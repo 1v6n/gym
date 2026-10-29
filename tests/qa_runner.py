@@ -476,11 +476,53 @@ def run_tests():
                       defect="state.isWorkoutActive is a single global boolean. Switching tabs during an active workout leaves 'Finalizar sesion' active on any other tab and finishing it overwrites that tab's session." if tab_switch_active else None)
         page.screenshot(path=f"{SCREENSHOT_DIR}/23_active_workout_cross_tab.png")
 
-        # Switch back to Upper A and finish/reset
-        page.locator("button[data-session='upperA']").click()
-        page.wait_for_timeout(200)
-        page.locator("#btnToggleWorkout").click() # confirm finish
+        # History Feature Tests
+        # History Feature Tests
+        # Test 31: Open History Modal on button click
+        page.locator("#btnHistory").click()
         page.wait_for_timeout(300)
+        history_modal_visible = not ("hidden" in (page.locator("#modalHistory").get_attribute("class") or ""))
+        record_result("Workout History: Modal Opens on Button Click",
+                      history_modal_visible,
+                      f"Modal classes: {page.locator('#modalHistory').get_attribute('class')}")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/24_history_modal_open.png")
+
+        # Test 32: Verify session logged in Test 11 appears in History List
+        history_cards_count = page.locator(".history-card").count()
+        record_result("Workout History: Session Recorded in History List",
+                      history_cards_count >= 1,
+                      f"Found {history_cards_count} history cards in modal.")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/25_history_card_rendered.png")
+
+        # Test 33: Expand history details
+        page.locator(".btn-toggle-detail").first.click()
+        page.wait_for_timeout(200)
+        details_visible = not ("hidden" in (page.locator(".history-card-details").first.get_attribute("class") or ""))
+        record_result("Workout History: Details Toggle Works",
+                      details_visible,
+                      "Expanded history card details table.")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/26_history_details_expanded.png")
+
+        # Test 34: Reload and verify persistence
+        page.reload()
+        page.wait_for_timeout(400)
+        page.locator("#btnHistory").click()
+        page.wait_for_timeout(300)
+        persisted_cards_count = page.locator(".history-card").count()
+        record_result("Workout History: Persists Across Page Reload",
+                      persisted_cards_count >= 1,
+                      f"Found {persisted_cards_count} history cards after reload.")
+
+        # Test 35: Delete history entry
+        page.locator(".btn-history-delete").first.click()
+        page.wait_for_timeout(300)
+        cards_after_delete = page.locator(".history-card").count()
+        empty_visible = page.locator(".history-empty").count() > 0
+        record_result("Workout History: Deletion from History List",
+                      cards_after_delete == 0 and empty_visible,
+                      f"Cards remaining: {cards_after_delete}, Empty state visible: {empty_visible}")
+        page.locator("#modalHistory [data-close-modal]").click()
+        page.wait_for_timeout(200)
 
         # Investigation D: Console errors check
         record_result("Console Errors & Unhandled Exceptions",
