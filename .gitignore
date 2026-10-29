@@ -13,3 +13,7 @@ hallmark/
 Thumbs.db
 .vscode/
 .idea/
+
+# Wrangler / Cloudflare
+.wrangler/
+

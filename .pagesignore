@@ -1,0 +1,21 @@
+# Tests and QA
+tests/
+__pycache__/
+*.py
+
+# Internal specs and docs
+scripts/
+docs/
+odd/
+AGENTS.md
+README.md
+
+# Cloned dependencies and local tools
+hallmark/
+.hallmark/
+
+# VCS and tool configurations
+.git/
+.github/
+.gga
+.wrangler/
