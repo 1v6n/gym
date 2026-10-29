@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Hallmark clone and build cache
+hallmark/
+.hallmark/
+
+# OS and Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

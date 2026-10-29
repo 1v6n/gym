@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Seguimiento de sobrecarga progresiva y temporizador para la rutina de hipertrofia de 4 dias.">
+  <meta name="theme-color" content="#151820">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hypertrophy">
+  <title>Hypertrophy DDP Coach</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/>
+          </svg>
+        </div>
+        <div class="header-titles">
+          <h1>Hypertrophy DDP</h1>
+          <span class="sub-title" id="deloadStatus">4-day upper and lower split</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnSettings" class="icon-btn" aria-label="Ajustes y herramientas" title="Ajustes">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workout Selector Tabs -->
+    <nav class="session-tabs">
+      <button class="tab-btn active" data-session="upperA">
+        <span class="tab-day">lun</span>
+        <span class="tab-name">Upper A</span>
+      </button>
+      <button class="tab-btn" data-session="lowerA">
+        <span class="tab-day">mar</span>
+        <span class="tab-name">Lower A</span>
+      </button>
+      <button class="tab-btn" data-session="upperB">
+        <span class="tab-day">jue</span>
+        <span class="tab-name">Upper B</span>
+      </button>
+      <button class="tab-btn" data-session="lowerB">
+        <span class="tab-day">vie</span>
+        <span class="tab-name">Lower B</span>
+      </button>
+    </nav>
+
+    <!-- Session Info & Active Status Banner -->
+    <div class="session-summary-card">
+      <div class="summary-top">
+        <div>
+          <h2 id="sessionTitle">Upper A: Horizontal Push y Vertical Pull</h2>
+          <p id="sessionFocus" class="summary-focus">Flat DB Press, Lat Pulldown, Incline Smith, Direct Arms</p>
+        </div>
+        <div class="summary-metrics">
+          <span class="metric-pill" id="totalSetsCount">19 series</span>
+          <span class="metric-pill unit-pill" id="currentUnitPill">kg</span>
+        </div>
+      </div>
+      <div class="session-action-bar">
+        <button id="btnToggleWorkout" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span id="lblWorkoutAction">Iniciar entrenamiento</span>
+        </button>
+        <button id="btnQuickNotes" class="btn-secondary" title="Ver principios DDP">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Guia DDP
+        </button>
+      </div>
+    </div>
+
+    <!-- Active DDP Coach Insight Banner (Contextual) -->
+    <div id="ddpBanner" class="ddp-alert hidden">
+      <div class="ddp-alert-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="ddp-alert-content" id="ddpAlertText">
+        <strong>Serie 1 progression driver:</strong> alcanza el tope de repeticiones para subir el peso la proxima semana.
+      </div>
+      <button class="ddp-alert-close" id="btnCloseDdpBanner" aria-label="Cerrar aviso">&times;</button>
+    </div>
+
+    <!-- Exercises Container -->
+    <main class="exercises-container" id="exercisesList">
+      <!-- Dynamic Exercises Injected by app.js -->
+    </main>
+
+    <!-- Floating Persistent Rest Timer Bar -->
+    <div id="restTimerBar" class="timer-bar hidden">
+      <div class="timer-bar-content">
+        <div class="timer-visual-group">
+          <div class="timer-icon-pulse">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="timer-meta">
+            <span class="timer-label" id="timerExerciseLabel">Descanso</span>
+            <span class="timer-clock" id="timerClock">02:00</span>
+          </div>
+        </div>
+        <div class="timer-controls">
+          <button id="btnTimerMinus" class="timer-btn" title="Menos 30 segundos">-30s</button>
+          <button id="btnTimerPlus" class="timer-btn" title="Mas 30 segundos">+30s</button>
+          <button id="btnTimerToggle" class="timer-btn timer-btn-toggle" aria-label="Pausar o reanudar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="timerToggleIcon">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+          <button id="btnTimerSkip" class="timer-btn timer-btn-skip" aria-label="Saltar descanso">✕</button>
+        </div>
+      </div>
+      <div class="timer-progress-track">
+        <div id="timerProgressBar" class="timer-progress-fill" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- Settings & Tools Modal -->
+    <div id="modalSettings" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Ajustes y herramientas</h3>
+          <button class="modal-close" data-close-modal aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="setting-item">
+            <div>
+              <span class="setting-title">Unidad de peso</span>
+              <span class="setting-desc">Kilogramos (kg) o libras (lbs)</span>
+            </div>
+            <div class="toggle-group">
+              <button id="btnUnitKg" class="toggle-btn active">kg</button>
+              <button id="btnUnitLbs" class="toggle-btn">lbs</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div>
+              <span class="setting-title">Semana de deload</span>
+              <span class="setting-desc">Reduce volumen al 50% y ajusta a 3 o 4 RIR</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="chkDeloadMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div>
+              <span class="setting-title">Sonido y vibracion del timer</span>
+              <span class="setting-desc">Campana sintetizada Web Audio y respuesta haptica</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="chkAudioVibrate" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <hr class="modal-divider">
+
+          <h4 class="modal-section-title">Datos y respaldo</h4>
+          <div class="data-actions-grid">
+            <button id="btnExportMarkdown" class="btn-outline">
+              Copiar resumen en Markdown
+            </button>
+            <button id="btnExportJson" class="btn-outline">
+              Descargar respaldo JSON
+            </button>
+            <label class="btn-outline file-label">
+              Restaurar archivo JSON
+              <input type="file" id="fileImportJson" accept=".json" style="display:none">
+            </label>
+            <button id="btnResetHistory" class="btn-outline btn-danger-outline">
+              Borrar historial guardado
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DDP & Principles Guide Modal -->
+    <div id="modalGuide" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Motor de sobrecarga (DDP)</h3>
+          <button class="modal-close" data-close-modal aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="modal-body modal-guide-text">
+          <h4>1. Dynamic Double Progression</h4>
+          <p>La Serie 1 es la que dicta el progreso. No subas peso hasta que la Serie 1 alcance el tope de repeticiones (ejemplo: 8 reps en un rango de 6 a 8) con el RIR estipulado. Cuando lo logres, la semana siguiente aumentas entre 2.5% y 5%.</p>
+          
+          <h4>2. Regulacion intra-sesion</h4>
+          <p>Si la fatiga hace que las Series 2 o 3 caigan por debajo del piso (menos de 6 reps), reduce la carga entre 5% y 10% en esa serie para mantenerte en el rango hipertrofico optimo.</p>
+
+          <h4>3. RIR y seguridad articular</h4>
+          <p>Ejercicios con carga axial (Hack Squat, RDL, Press DB): manten 1 a 3 RIR. Nunca vayas al fallo concentrico. En maquinas y poleas de aislamiento: 0 a 1 RIR.</p>
+
+          <h4>4. Tecnicas de intensidad en la ultima serie</h4>
+          <ul>
+            <li>Rest-Pause: al fallar en 0 RIR, suelta la carga 15 segundos, saca 4 reps, descansa 15 segundos y saca 3 reps finales.</li>
+            <li>Lengthened Partials: al fallar en el rango completo, realiza 4 a 6 pulsos en la mitad mas estirada del movimiento.</li>
+            <li>Loaded Stretch: manten la posicion abierta estirada bajo carga durante 10 segundos continuos.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Substitutions Modal -->
+    <div id="modalSubstitutions" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="subModalTitle">Sustituciones de ejercicio</h3>
+          <button class="modal-close" data-close-modal aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="modal-body" id="subModalBody">
+          <!-- Dynamic Content -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
