@@ -36,7 +36,8 @@ def get_ip_addresses():
     return ips
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir(project_root)
     handler = http.server.SimpleHTTPRequestHandler
     handler.extensions_map.update({
         '.json': 'application/json',

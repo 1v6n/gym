@@ -7,15 +7,16 @@ import json
 from playwright.async_api import async_playwright
 
 PORT = 8089
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SCREENSHOTS_DIR = os.path.join(BASE_DIR, "qa_screenshots")
+TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(TESTS_DIR)
+SCREENSHOTS_DIR = os.path.join(TESTS_DIR, "screenshots")
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
 def start_server():
-    os.chdir(BASE_DIR)
+    os.chdir(PROJECT_ROOT)
     QuietHandler.extensions_map.update({
         '.json': 'application/json',
         '.svg': 'image/svg+xml',

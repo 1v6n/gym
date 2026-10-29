@@ -1,13 +1,13 @@
-const CACHE_NAME = 'hypertrophy-ddp-v3';
+const CACHE_NAME = 'hypertrophy-ddp-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css',
-  './tokens.css',
-  './base.css',
-  './app.js',
   './manifest.json',
-  './icon.svg'
+  './assets/icons/icon.svg',
+  './assets/css/styles.css',
+  './assets/css/tokens.css',
+  './assets/css/base.css',
+  './assets/js/app.js'
 ];
 
 self.addEventListener('install', (event) => {

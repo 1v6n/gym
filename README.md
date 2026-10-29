@@ -57,22 +57,35 @@ GitHub Pages is the easiest, fastest way to host this app with free, automatic H
 ## 📂 Project Structure
 
 ```text
-├── index.html                 # Main PWA application entry point
-├── styles.css                 # Responsive Dusk layout and component styles
-├── tokens.css                 # OKLCH color tokens, spacing, and typography scales
-├── base.css                   # CSS reset and utility definitions
-├── app.js                     # Routine data, DDP progression engine, rest timer & state
-├── manifest.json              # Web App Manifest for mobile installation
-├── sw.js                      # Service Worker for full offline caching (v3)
-├── icon.svg                   # PWA vector icon and apple-touch-icon
-├── serve.py                   # Lightweight local development server
-├── routine.md                 # Evidence-based training principles and anatomy breakdown
-├── OPEN_SOURCE_COMPARISON.md  # Comprehensive benchmark vs existing open-source trackers
-├── workout_log.md             # Markdown workout logging template
-├── .gitignore                 # Excluded build and local cache files
-├── qa_runner.py               # Synchronous Playwright functional E2E test runner (30 tests)
-├── run_qa.py                  # Multi-viewport responsive visual & contrast test suite
-└── qa_screenshots/            # Automated test captures and machine-readable audit report
+gym/
+├── index.html                   # Main PWA application entry point (GitHub Pages root)
+├── manifest.json                # Web App Manifest for mobile installation
+├── sw.js                        # Service Worker for full offline caching (v4)
+├── README.md                    # Project documentation & GitHub Pages guide
+├── .gitignore                   # Excluded build and local cache files
+│
+├── assets/                      # Production frontend assets
+│   ├── css/
+│   │   ├── tokens.css           # OKLCH design tokens (colors, spacing, typography)
+│   │   ├── base.css             # CSS reset & typography baseline
+│   │   └── styles.css           # Responsive Dusk layout and component styles
+│   ├── js/
+│   │   └── app.js               # Routine data, DDP progression engine, timer & state
+│   └── icons/
+│       └── icon.svg             # PWA vector icon and apple-touch-icon
+│
+├── docs/                        # Reference documentation
+│   ├── routine.md               # Evidence-based training principles and anatomy breakdown
+│   ├── workout_log.md           # Markdown workout logging template
+│   └── OPEN_SOURCE_COMPARISON.md# Comprehensive benchmark vs existing open-source trackers
+│
+├── scripts/                     # Local developer utilities
+│   └── serve.py                 # Lightweight Wi-Fi development server
+│
+└── tests/                       # Automated Playwright QA & visual regression suite
+    ├── qa_runner.py             # Synchronous Playwright functional E2E runner (30 tests)
+    ├── run_qa.py                # Multi-viewport responsive visual & contrast test suite
+    └── screenshots/             # 41 visual test captures & machine-readable audit report
 ```
 
 ---
@@ -82,23 +95,20 @@ GitHub Pages is the easiest, fastest way to host this app with free, automatic H
 ### Running the Local Server
 ```bash
 # Using UV
-uv run python serve.py
+uv run python scripts/serve.py
 
 # Or standard Python 3
-python3 serve.py
+python3 scripts/serve.py
 ```
 Access at `http://localhost:8080` (or the printed local Wi-Fi IP from your mobile phone).
 
 ### Running Automated Playwright QA
 ```bash
 # Run all 30 functional E2E tests
-uv run python qa_runner.py
+uv run python tests/qa_runner.py
 
 # Run responsive visual audits (Desktop, iPhone, Android, 320px)
-uv run python run_qa.py
-
-# Verify Hallmark design compliance (0 slop)
-node /path/to/hallmark/scripts/sloplint.mjs index.html --scope app
+uv run python tests/run_qa.py
 ```
 
 ---
