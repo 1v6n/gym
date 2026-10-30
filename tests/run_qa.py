@@ -397,6 +397,7 @@ async def run_qa():
         # 4i. Switch tab to Lower A
         print("\n--- Testing Tab Navigation to Lower A ---")
         await page.locator(".tab-btn[data-session='lowerA']").click()
+        await page.wait_for_timeout(250)
         lower_title = await page.locator("#sessionTitle").text_content()
         lower_first_ex = await page.locator(".exercise-title").first.text_content()
         results["functionality"]["tab_navigation"] = {

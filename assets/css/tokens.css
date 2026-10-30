@@ -1,5 +1,5 @@
-/* Hallmark · shape: app screen · genre: editorial · theme: Training ledger (by request) · v2.0.0 */
-/* Critique: paper surfaces and ruled rows replace dark panels; numeric fields retain strong edges. */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Linear (locked design.md) · v2.0.0 */
+/* Critique: deep #010102 canvas with 4-step surface ladder, signature lavender-blue accent and high-legibility grotesque sans. */
 
 :root {
   color-scheme: light;
@@ -17,30 +17,30 @@
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-md: 1rem;
-  --text-lg: 1.2rem;
-  --text-xl: 1.44rem;
-  --text-2xl: 1.728rem;
-  --text-3xl: 2.074rem;
+  --text-lg: 1.15rem;
+  --text-xl: 1.35rem;
+  --text-2xl: 1.6rem;
+  --text-3xl: 2rem;
 
-  --text-display-s: 1.44rem;
-  --text-display: 1.728rem;
-  --text-section: 1.44rem;
-  --text-title: 1.2rem;
+  --text-display-s: 1.35rem;
+  --text-display: 1.6rem;
+  --text-section: 1.35rem;
+  --text-title: 1.15rem;
   --text-lead: 1rem;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-micro: 120ms;
-  --dur-short: 220ms;
-  --dur-long: 420ms;
+  --dur-short: 200ms;
+  --dur-long: 350ms;
 
-  --color-error: #922f30;
-  --color-error-bg: #f6e6df;
-  --color-error-rule: #b16b62;
-  --color-success: #305c42;
-  --color-success-bg: #e5ebdb;
-  --color-success-rule: #6b886b;
+  --color-error: light-dark(#c62828, #eb5757);
+  --color-error-bg: light-dark(#fde8e8, #2a1618);
+  --color-error-rule: light-dark(#f8b4b4, #5c2427);
+  --color-success: light-dark(#256828, #27a644);
+  --color-success-bg: light-dark(#edf7ed, #142a1b);
+  --color-success-rule: light-dark(#b7dfb9, #235230);
 
   --container: 1440px;
   --gutter: 64px;
@@ -58,107 +58,69 @@
   --z-toast: 500;
   --z-tooltip: 600;
 
-  /* Ivory leaves on a bookcloth ground. */
-  --color-paper: #f4eddf;
-  --color-paper-2: #fcf8ee;
-  --color-paper-3: #eae1d0;
-  --color-paper-4: #dfd3bd;
-  --color-desk: #d8cebb;
+  /* Linear Typography Hierarchy */
+  --font-display: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", ui-monospace, Menlo, monospace;
 
-  --color-ink: #302a24;
-  --color-ink-2: #494036;
-  --color-muted: #665b4e;
-  --color-faint: #736655;
-
-  --color-rule: #c9bca6;
-  --color-rule-strong: #8a7b65;
-  --color-rule-focus: #772f3b;
-  --color-light: #302a24;
-  --color-shade: #fffdf7;
-  --color-overlay: #302a24b8;
-  --color-shadow: #302a2426;
-
-  /* Burgundy ink for actions and the selected training day. */
-  --color-accent: #772f3b;
-  --color-accent-ink: #fff8ec;
-  --color-accent-hi: #59212c;
-  --color-accent-deep: #59212c;
-  --color-accent-soft: #f0ddd6;
-  --color-accent-bg: #f0e1d9;
-  --color-accent-rule: #9c6265;
-  --color-focus: #772f3b;
-
-  --color-accent-2: #744d2c;
-  --color-accent-2-bg: #eee3ce;
-  --color-accent-2-rule: #a48b63;
-  --color-dusk: #744d2c;
-
-  --color-day-ink: oklch(22% 0.022 50);
-  --color-day-muted: oklch(38% 0.022 50);
-  --color-fog: oklch(94% 0.012 70);
-
-  --color-well: oklch(95.5% 0.008 75);
-  --color-well-2: oklch(92% 0.010 75);
-  --color-well-ink: oklch(21% 0.016 50);
-  --color-well-muted: oklch(47% 0.016 50);
-  --color-well-rule: oklch(87.5% 0.009 75);
-  --color-card: oklch(99.5% 0.003 75);
-
-  /* Vintage Typography Hierarchy */
-  --font-display: Georgia, "Times New Roman", serif;
-  --font-body: "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, monospace;
-
-  --radius-card: 2px;
-  --radius-inner: 2px;
-  --radius-pill: 2px;
+  /* Linear Ergonomics */
+  --radius-card: 12px;
+  --radius-inner: 8px;
+  --radius-pill: 9999px;
   --rule-hair: 1px;
-  --rule-heavy: 3px;
+  --rule-heavy: 2px;
   --control-size: 44px;
   --ledger-width: 1080px;
   --ledger-mobile-width: 560px;
   --shadow-sheet: 0 var(--space-xs) var(--space-xl) var(--color-shadow);
 
-  --tracking-display: -0.015em;
-  --display-weight: 400;
-}
+  --tracking-display: -0.025em;
+  --display-weight: 600;
 
-/* Ivory ledger by day; midnight slate and dusty blue after dark. */
-:root {
-  --color-paper: light-dark(#f4eddf, #1b2430);
-  --color-paper-2: light-dark(#fcf8ee, #222e3b);
-  --color-paper-3: light-dark(#eae1d0, #2c3b4b);
-  --color-paper-4: light-dark(#dfd3bd, #384b5e);
-  --color-desk: light-dark(#d8cebb, #131b25);
-  --color-ink: light-dark(#302a24, #eceff1);
-  --color-ink-2: light-dark(#494036, #d1dbe4);
-  --color-muted: light-dark(#665b4e, #afbfce);
-  --color-faint: light-dark(#736655, #a0b2c4);
-  --color-rule: light-dark(#c9bca6, #4b6074);
-  --color-rule-strong: light-dark(#8a7b65, #8096ab);
-  --color-rule-focus: light-dark(#772f3b, #a3bfd8);
-  --color-light: light-dark(#302a24, #f5f7f9);
-  --color-shade: light-dark(#fffdf7, #16202b);
-  --color-overlay: light-dark(#302a24b8, #0b121bdb);
-  --color-shadow: light-dark(#302a2426, #00000059);
-  --color-accent: light-dark(#772f3b, #a3bfd8);
-  --color-accent-ink: light-dark(#fff8ec, #182431);
-  --color-accent-hi: light-dark(#59212c, #bfd2e3);
-  --color-accent-deep: light-dark(#59212c, #bfd2e3);
-  --color-accent-soft: light-dark(#f0ddd6, #344c63);
-  --color-accent-bg: light-dark(#f0e1d9, #2b4055);
-  --color-accent-rule: light-dark(#9c6265, #7e9db9);
-  --color-focus: light-dark(#772f3b, #a3bfd8);
-  --color-accent-2: light-dark(#744d2c, #b6c9db);
-  --color-accent-2-bg: light-dark(#eee3ce, #2a3b4d);
-  --color-accent-2-rule: light-dark(#a48b63, #7e96ad);
-  --color-dusk: light-dark(#744d2c, #b6c9db);
-  --color-error: light-dark(#922f30, #e3aaa9);
-  --color-error-bg: light-dark(#f6e6df, #3b2e38);
-  --color-error-rule: light-dark(#b16b62, #a47980);
-  --color-success: light-dark(#305c42, #a6c9be);
-  --color-success-bg: light-dark(#e5ebdb, #263d3c);
-  --color-success-rule: light-dark(#6b886b, #779e92);
+  /* Base / Fallback Swatches */
+  --color-paper: light-dark(#ffffff, #010102);
+  --color-paper-2: light-dark(#f7f8f8, #0f1011);
+  --color-paper-3: light-dark(#eceff1, #141516);
+  --color-paper-4: light-dark(#e2e6e9, #191a1b);
+  --color-desk: light-dark(#eef1f4, #08090a);
+
+  --color-ink: light-dark(#0f1011, #f7f8f8);
+  --color-ink-2: light-dark(#282a2e, #d0d6e0);
+  --color-muted: light-dark(#62666d, #8a8f98);
+  --color-faint: light-dark(#8a8f98, #62666d);
+
+  --color-rule: light-dark(rgba(0, 0, 0, 0.08), #23252a);
+  --color-rule-strong: light-dark(rgba(0, 0, 0, 0.16), #34343a);
+  --color-rule-focus: #5e6ad2;
+  --color-light: light-dark(#0f1011, #f7f8f8);
+  --color-shade: light-dark(#ffffff, #0a0b0c);
+  --color-overlay: light-dark(rgba(15, 16, 17, 0.6), rgba(1, 1, 2, 0.88));
+  --color-shadow: light-dark(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.5));
+
+  /* Signature Linear Lavender Accent */
+  --color-accent: light-dark(#5e6ad2, #5e6ad2);
+  --color-accent-ink: #ffffff;
+  --color-accent-hi: light-dark(#4b55b7, #828fff);
+  --color-accent-deep: light-dark(#4b55b7, #5e69d1);
+  --color-accent-soft: light-dark(#eef0fb, #1c1f36);
+  --color-accent-bg: light-dark(rgba(94, 106, 210, 0.08), rgba(94, 106, 210, 0.16));
+  --color-accent-rule: light-dark(rgba(94, 106, 210, 0.25), rgba(94, 106, 210, 0.35));
+  --color-focus: #5e6ad2;
+
+  --color-accent-2: light-dark(#4d517a, #9da1ce);
+  --color-accent-2-bg: light-dark(rgba(77, 81, 122, 0.1), rgba(157, 161, 206, 0.16));
+  --color-accent-2-rule: light-dark(rgba(77, 81, 122, 0.25), rgba(157, 161, 206, 0.35));
+  --color-dusk: light-dark(#5e6ad2, #828fff);
+
+  --color-day-ink: #0f1011;
+  --color-day-muted: #62666d;
+  --color-fog: #f7f8f8;
+  --color-well: #f7f8f8;
+  --color-well-2: #eceff1;
+  --color-well-ink: #0f1011;
+  --color-well-muted: #62666d;
+  --color-well-rule: rgba(0, 0, 0, 0.08);
+  --color-card: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
