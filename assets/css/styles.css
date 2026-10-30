@@ -1,7 +1,7 @@
 /* Hallmark · shape: app screen · genre: atmospheric · theme: Lumen / Kiln (Golden Era Iron) · redesign: restyle
  * nav: tabs · signature: ddp-top-set-tracker · states: 8 · dark-vintage: espresso-cream-bronze
  * axes: dark/roman-serif/warm · posture: restrained · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P8 H8 E8 S9 R8 V8 · weakest: E, tightened touch targets to 44px minimum with full 8 states */
+/* Hallmark · pre-emit critique: prior P8 H8 E8 S9 R8 V8 kept as baseline, not re-scored this pass · fixed: display-scale h1, token-strong field edges, 44px targets down to 320px via Previa column drop, chevron affordance on drawers · weakest still: E (drawer density) */
 @import url("./tokens.css");
 @import url("./base.css");
 
@@ -508,12 +508,14 @@
 .btn-accordion {
   background: transparent;
   border: none;
-  color: var(--color-muted);
-  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: var(--space-2xs);
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
   cursor: pointer;
   margin-top: var(--space-xs);
   padding: var(--space-2xs) 0;
@@ -526,6 +528,21 @@
 
 .btn-accordion:focus-visible {
   outline: 2px solid var(--color-focus);
+}
+
+.accordion-chevron {
+  width: 7px;
+  height: 7px;
+  border-right: var(--rule-hair) solid currentColor;
+  border-bottom: var(--rule-hair) solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur-micro) var(--ease-out);
+  flex: none;
+  margin-left: var(--space-xs);
+}
+
+.btn-accordion[aria-expanded="true"] .accordion-chevron {
+  transform: rotate(-135deg);
 }
 
 .accordion-drawer {
@@ -577,7 +594,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 36px 56px 1fr 1fr 52px 48px;
+  grid-template-columns: 32px minmax(44px, 56px) minmax(44px, 1fr) minmax(44px, 1fr) 48px 44px;
   gap: var(--space-xs);
   padding: var(--space-2xs) 0;
   font-size: var(--text-xs);
@@ -589,7 +606,7 @@
 
 .set-row {
   display: grid;
-  grid-template-columns: 36px 56px 1fr 1fr 52px 48px;
+  grid-template-columns: 32px minmax(44px, 56px) minmax(44px, 1fr) minmax(44px, 1fr) 48px 44px;
   gap: var(--space-xs);
   align-items: center;
   padding: var(--space-2xs) 0;
@@ -626,7 +643,7 @@
   width: 100%;
   min-height: 44px;
   background: var(--color-paper-3);
-  border: var(--rule-hair) solid var(--color-rule);
+  border: var(--rule-hair) solid var(--color-rule-strong);
   border-radius: var(--radius-inner);
   color: var(--color-ink);
   font-family: inherit;
@@ -635,6 +652,11 @@
   text-align: center;
   outline: none;
   transition: border-color var(--dur-micro) var(--ease-out);
+}
+
+.set-input::placeholder {
+  color: var(--color-faint);
+  font-weight: 400;
 }
 
 .set-input:hover {
@@ -660,7 +682,7 @@
   width: 100%;
   min-height: 44px;
   background: var(--color-paper-3);
-  border: var(--rule-hair) solid var(--color-rule);
+  border: var(--rule-hair) solid var(--color-rule-strong);
   border-radius: var(--radius-inner);
   color: var(--color-muted);
   font-size: var(--text-md);
@@ -669,6 +691,17 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+
+/* An empty box reads as a broken input: show a quiet check while the set is open. */
+.set-row:not(.completed) .set-check-btn::before {
+  content: "";
+  width: 10px;
+  height: 5px;
+  border-left: var(--rule-hair) solid currentColor;
+  border-bottom: var(--rule-hair) solid currentColor;
+  transform: rotate(-45deg) translateY(-2px);
+  opacity: 0.4;
 }
 
 .set-check-btn:hover {
@@ -1340,6 +1373,20 @@ input:checked + .slider:before {
   font-size: var(--text-xs);
   color: var(--color-muted);
   padding: var(--space-xs);
+}
+
+/* Narrow phones: drop the "Previa" column so weight/reps keep 44px targets.
+   Stacks below the min-width: 600px query on purpose, so the two never overlap. */
+@media (max-width: 400px) {
+  .table-header,
+  .set-row {
+    grid-template-columns: 32px minmax(44px, 1fr) minmax(44px, 1fr) 48px 44px;
+  }
+
+  .table-header > :nth-child(2),
+  .set-row > .set-col-prev {
+    display: none;
+  }
 }
 
 /* Desktop container constraint */

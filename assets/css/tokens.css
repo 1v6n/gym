@@ -67,9 +67,10 @@
   --color-ink: oklch(94.5% 0.018 80);
   --color-ink-2: oklch(85% 0.022 75);
   --color-muted: oklch(71% 0.028 65);
-  --color-faint: oklch(56% 0.024 60);
+  --color-faint: oklch(64% 0.026 64);
 
   --color-rule: oklch(96% 0.01 80 / 0.12);
+  --color-rule-strong: oklch(96% 0.01 80 / 0.45); /* visible control edge, >=3:1 on paper-3 */
   --color-rule-focus: oklch(74% 0.17 62);
   --color-light: oklch(98.5% 0.01 80);
   --color-shade: oklch(9% 0.015 50);

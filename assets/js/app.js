@@ -961,7 +961,7 @@ function renderSession() {
                    value="${valRir}" aria-label="RIR para serie ${setNum}">
           </div>
           <div>
-            <button class="set-check-btn" data-ex="${exercise.id}" data-set="${i}" aria-label="Marcar serie ${setNum} como completada">
+            <button class="set-check-btn" data-ex="${exercise.id}" data-set="${i}" aria-label="Marcar serie ${setNum} como completada" aria-pressed="${isCompleted ? 'true' : 'false'}">
               ${isCompleted ? '✓' : ''}
             </button>
           </div>
@@ -995,8 +995,9 @@ function renderSession() {
             ${exercise.technique.badge}
           </div>
         ` : ''}
-        <button class="btn-accordion" data-accordion="${exercise.id}">
+        <button class="btn-accordion" data-accordion="${exercise.id}" aria-expanded="false" aria-controls="drawer_${exercise.id}">
           <span>Tecnica y sustituciones</span>
+          <span class="accordion-chevron" aria-hidden="true"></span>
         </button>
       </div>
 
@@ -1068,7 +1069,12 @@ function attachExerciseCardListeners() {
     btn.onclick = () => {
       const exId = btn.getAttribute('data-accordion');
       const drawer = document.getElementById(`drawer_${exId}`);
-      if (drawer) drawer.classList.toggle('hidden');
+      if (!drawer) {
+        console.warn(`Accordion drawer missing for exercise ${exId}`);
+        return;
+      }
+      const isHidden = drawer.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', String(!isHidden));
     };
   });
 
@@ -1115,6 +1121,7 @@ function attachExerciseCardListeners() {
       if (!state.draft[draftKey]) state.draft[draftKey] = {};
       const isDone = !state.draft[draftKey].done;
       state.draft[draftKey].done = isDone;
+      btn.setAttribute('aria-pressed', String(isDone));
 
       const exercise = ROUTINE_DATA[state.currentSessionId].exercises.find(e => e.id === exId);
       const weightVal = parseFloat(row.querySelector('.set-input-weight').value) || 0;
