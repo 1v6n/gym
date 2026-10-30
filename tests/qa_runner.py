@@ -513,7 +513,39 @@ def run_tests():
                       persisted_cards_count >= 1,
                       f"Found {persisted_cards_count} history cards after reload.")
 
-        # Test 35: Delete history entry
+        # Test 35: Progression Chart: Tab Switch
+        page.locator("#tabHistoryCharts").click()
+        page.wait_for_timeout(300)
+        charts_visible = not ("hidden" in (page.locator("#historyChartsView").get_attribute("class") or ""))
+        sessions_hidden = "hidden" in (page.locator("#historySessionsView").get_attribute("class") or "")
+        record_result("Progression Chart: Tab Switching",
+                      charts_visible and sessions_hidden,
+                      f"Charts visible: {charts_visible}, Sessions hidden: {sessions_hidden}")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/27_progression_charts_view.png")
+
+        # Test 36: Progression Chart: SVG Render & Exercise Select
+        svg_count = page.locator(".chart-svg").count()
+        points_count = page.locator(".chart-hit-circle").count()
+        polyline_count = page.locator(".chart-svg polyline").count()
+        select_options_count = page.locator("#historyExerciseSelect option").count()
+        record_result("Progression Chart: SVG Chart Rendered with Nodes",
+                      svg_count == 1 and points_count >= 1 and polyline_count == 1 and select_options_count > 0,
+                      f"SVG: {svg_count}, Points: {points_count}, Polyline: {polyline_count}, Exercises in select: {select_options_count}")
+
+        # Test 37: Progression Chart: Metric Toggle (1RM Estimado)
+        page.locator('.metric-pill-btn[data-metric="e1rm"]').click()
+        page.wait_for_timeout(200)
+        active_metric = page.locator('.metric-pill-btn.active').get_attribute("data-metric")
+        tooltip_rendered = page.locator("#chartPointDetail").count() > 0
+        record_result("Progression Chart: Metric Toggle Recalculates Data",
+                      active_metric == "e1rm" and tooltip_rendered,
+                      f"Active metric: '{active_metric}', Detail card visible: {tooltip_rendered}")
+
+        # Return to sessions tab
+        page.locator("#tabHistorySessions").click()
+        page.wait_for_timeout(200)
+
+        # Test 38: Delete history entry
         page.locator(".btn-history-delete").first.click()
         page.wait_for_timeout(300)
         cards_after_delete = page.locator(".history-card").count()

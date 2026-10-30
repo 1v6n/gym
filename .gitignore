@@ -17,3 +17,6 @@ Thumbs.db
 # Wrangler / Cloudflare
 .wrangler/
 
+# Test output
+tests/screenshots/
+

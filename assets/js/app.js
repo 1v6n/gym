@@ -564,7 +564,20 @@ const state = {
   logs: {},
   history: [],
   draft: {},
-  audioCtx: null
+  audioCtx: null,
+  timer: {
+    interval: null,
+    hideTimeout: null,
+    remainingSeconds: 0,
+    totalSeconds: 0,
+    isPaused: false,
+    exerciseTitle: ''
+  },
+  progression: {
+    exerciseId: null,
+    metric: 'set1_weight',
+    selectedPointIndex: null
+  }
 };
 
 // Web Audio API Synth Sound
@@ -614,6 +627,17 @@ function saveStorageItem(key, value) {
     return true;
   } catch (err) {
     console.error(`Error saving to localStorage key "${key}":`, err);
+    const isQuotaError = err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED' || err.code === 22 || err.code === 1014;
+    if (isQuotaError && key === STORAGE_KEYS.HISTORY && Array.isArray(value) && value.length > 5) {
+      try {
+        const pruned = value.slice(-Math.floor(value.length * 0.8));
+        localStorage.setItem(key, JSON.stringify(pruned));
+        console.warn('Storage quota exceeded: pruned oldest history entries to preserve recent workouts.');
+        return true;
+      } catch (innerErr) {
+        console.error('Fallback pruning failed to free quota:', innerErr);
+      }
+    }
     return false;
   }
 }
@@ -622,7 +646,12 @@ function loadState() {
   try {
     const savedLogs = localStorage.getItem(STORAGE_KEYS.LOGS);
     if (savedLogs) state.logs = JSON.parse(savedLogs);
+  } catch (err) {
+    console.warn('Corrupted logs in storage, resetting to default:', err);
+    state.logs = {};
+  }
 
+  try {
     const savedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
     if (savedHistory) {
       const parsedHistory = JSON.parse(savedHistory);
@@ -630,7 +659,12 @@ function loadState() {
     } else {
       state.history = [];
     }
+  } catch (err) {
+    console.warn('Corrupted history in storage, resetting to empty array:', err);
+    state.history = [];
+  }
 
+  try {
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     if (savedSettings) {
       const parsed = JSON.parse(savedSettings);
@@ -638,7 +672,11 @@ function loadState() {
       state.isDeloadMode = !!parsed.isDeloadMode;
       state.audioVibrate = parsed.audioVibrate !== false;
     }
+  } catch (err) {
+    console.warn('Corrupted settings in storage, using defaults:', err);
+  }
 
+  try {
     const savedDraft = localStorage.getItem(STORAGE_KEYS.ACTIVE_DRAFT);
     if (savedDraft) {
       state.draft = JSON.parse(savedDraft);
@@ -650,7 +688,8 @@ function loadState() {
       }
     }
   } catch (err) {
-    console.error('Error loading state from localStorage:', err);
+    console.warn('Corrupted active draft in storage, resetting draft:', err);
+    state.draft = {};
   }
 }
 
@@ -682,20 +721,13 @@ function saveDraft() {
 // 3. REST TIMER IMPLEMENTATION
 // ============================================================================
 
-let timerInterval = null;
-let timerHideTimeout = null;
-let timerRemainingSeconds = 0;
-let timerTotalSeconds = 0;
-let timerIsPaused = false;
-let timerExerciseTitle = '';
-
 function startRestTimer(seconds, exerciseName = 'Descanso') {
-  clearInterval(timerInterval);
-  clearTimeout(timerHideTimeout);
-  timerTotalSeconds = seconds;
-  timerRemainingSeconds = seconds;
-  timerIsPaused = false;
-  timerExerciseTitle = exerciseName;
+  clearInterval(state.timer.interval);
+  clearTimeout(state.timer.hideTimeout);
+  state.timer.totalSeconds = seconds;
+  state.timer.remainingSeconds = seconds;
+  state.timer.isPaused = false;
+  state.timer.exerciseTitle = exerciseName;
 
   const bar = document.getElementById('restTimerBar');
   const label = document.getElementById('timerExerciseLabel');
@@ -709,16 +741,16 @@ function startRestTimer(seconds, exerciseName = 'Descanso') {
 
   updateTimerUI();
 
-  timerInterval = setInterval(() => {
-    if (!timerIsPaused) {
-      timerRemainingSeconds--;
+  state.timer.interval = setInterval(() => {
+    if (!state.timer.isPaused) {
+      state.timer.remainingSeconds--;
       updateTimerUI();
 
-      if (timerRemainingSeconds <= 0) {
-        clearInterval(timerInterval);
+      if (state.timer.remainingSeconds <= 0) {
+        clearInterval(state.timer.interval);
         playCompletionChime();
         if (bar) {
-          timerHideTimeout = setTimeout(() => {
+          state.timer.hideTimeout = setTimeout(() => {
             bar.classList.add('hidden');
           }, 3000);
         }
@@ -731,20 +763,20 @@ function updateTimerUI() {
   const clock = document.getElementById('timerClock');
   const progress = document.getElementById('timerProgressBar');
 
-  const mins = Math.floor(Math.max(0, timerRemainingSeconds) / 60);
-  const secs = Math.max(0, timerRemainingSeconds) % 60;
+  const mins = Math.floor(Math.max(0, state.timer.remainingSeconds) / 60);
+  const secs = Math.max(0, state.timer.remainingSeconds) % 60;
   const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
   if (clock) clock.textContent = formatted;
-  if (progress && timerTotalSeconds > 0) {
-    const pct = Math.max(0, Math.min(100, (timerRemainingSeconds / timerTotalSeconds) * 100));
+  if (progress && state.timer.totalSeconds > 0) {
+    const pct = Math.max(0, Math.min(100, (state.timer.remainingSeconds / state.timer.totalSeconds) * 100));
     progress.style.transform = `scaleX(${pct / 100})`;
   }
 }
 
 function stopRestTimer() {
-  clearInterval(timerInterval);
-  clearTimeout(timerHideTimeout);
+  clearInterval(state.timer.interval);
+  clearTimeout(state.timer.hideTimeout);
   const bar = document.getElementById('restTimerBar');
   if (bar) bar.classList.add('hidden');
 }
@@ -1138,24 +1170,24 @@ function setupGlobalListeners() {
 
   if (btnTimerMinus) {
     btnTimerMinus.onclick = () => {
-      timerRemainingSeconds = Math.max(5, timerRemainingSeconds - 30);
+      state.timer.remainingSeconds = Math.max(5, state.timer.remainingSeconds - 30);
       updateTimerUI();
     };
   }
 
   if (btnTimerPlus) {
     btnTimerPlus.onclick = () => {
-      timerRemainingSeconds += 30;
-      timerTotalSeconds += 30;
+      state.timer.remainingSeconds += 30;
+      state.timer.totalSeconds += 30;
       updateTimerUI();
     };
   }
 
   if (btnTimerToggle) {
     btnTimerToggle.onclick = () => {
-      timerIsPaused = !timerIsPaused;
+      state.timer.isPaused = !state.timer.isPaused;
       if (timerToggleIcon) {
-        timerToggleIcon.innerHTML = timerIsPaused 
+        timerToggleIcon.innerHTML = state.timer.isPaused 
           ? '<polygon points="5 3 19 12 5 21 5 3"></polygon>'
           : '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
       }
@@ -1245,6 +1277,7 @@ function setupGlobalListeners() {
       modalHistory.classList.remove('hidden');
     };
   }
+  setupHistoryTabs();
 
   if (btnExportJson) {
     btnExportJson.onclick = () => exportJsonBackup();
@@ -1333,8 +1366,44 @@ function finishWorkoutSession() {
   alert(`Entrenamiento ${session.name} finalizado y registrado.`);
 }
 
+function setupHistoryTabs() {
+  const tabSessions = document.getElementById('tabHistorySessions');
+  const tabCharts = document.getElementById('tabHistoryCharts');
+  const sessionsView = document.getElementById('historySessionsView');
+  const chartsView = document.getElementById('historyChartsView');
+
+  if (tabSessions && tabCharts && sessionsView && chartsView) {
+    tabSessions.onclick = () => {
+      tabSessions.classList.add('active');
+      tabSessions.setAttribute('aria-selected', 'true');
+      tabCharts.classList.remove('active');
+      tabCharts.setAttribute('aria-selected', 'false');
+      sessionsView.classList.remove('hidden');
+      chartsView.classList.add('hidden');
+    };
+
+    tabCharts.onclick = () => {
+      tabCharts.classList.add('active');
+      tabCharts.setAttribute('aria-selected', 'true');
+      tabSessions.classList.remove('active');
+      tabSessions.setAttribute('aria-selected', 'false');
+      chartsView.classList.remove('hidden');
+      sessionsView.classList.add('hidden');
+      renderProgressionView();
+    };
+  }
+}
+
 function renderHistoryModal() {
-  const container = document.getElementById('historyModalBody');
+  renderHistorySessions();
+  const chartsView = document.getElementById('historyChartsView');
+  if (chartsView && !chartsView.classList.contains('hidden')) {
+    renderProgressionView();
+  }
+}
+
+function renderHistorySessions() {
+  const container = document.getElementById('historySessionsView') || document.getElementById('historyModalBody');
   if (!container) return;
 
   if (!state.history || state.history.length === 0) {
@@ -1470,6 +1539,319 @@ function renderHistoryModal() {
     btn.onclick = () => {
       const id = btn.getAttribute('data-delete-history');
       deleteHistoryEntry(id);
+    };
+  });
+}
+
+function getAllExercisesList() {
+  const exercises = [];
+  const seen = new Set();
+  Object.values(ROUTINE_DATA).forEach(session => {
+    session.exercises?.forEach(ex => {
+      if (!seen.has(ex.id)) {
+        seen.add(ex.id);
+        exercises.push({ id: ex.id, name: ex.name, sessionTitle: session.title });
+      }
+    });
+  });
+  return exercises;
+}
+
+function getExerciseHistoryData(exerciseId) {
+  if (!state.history || state.history.length === 0) return [];
+  const sorted = [...state.history].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  const points = [];
+
+  sorted.forEach(entry => {
+    const exSets = entry.exercises?.[exerciseId];
+    if (!exSets || exSets.length === 0) return;
+
+    const completedSets = exSets.filter(s => s.done || (s.weight > 0 && s.reps > 0));
+    if (completedSets.length === 0) return;
+
+    const set1 = completedSets[0];
+    const set1Weight = Number(set1.weight) || 0;
+    const set1Reps = Number(set1.reps) || 0;
+    const set1Rir = set1.rir !== undefined ? set1.rir : null;
+
+    // Epley formula for estimated 1RM
+    const e1rm = set1Reps > 1 ? Math.round((set1Weight * (1 + set1Reps / 30)) * 10) / 10 : set1Weight;
+
+    // Total exercise tonnage/volume in that session
+    const totalVolume = completedSets.reduce((sum, s) => sum + ((Number(s.weight) || 0) * (Number(s.reps) || 0)), 0);
+
+    points.push({
+      historyId: entry.id,
+      date: entry.displayDate || entry.dateString || new Date(entry.timestamp).toLocaleDateString(),
+      timestamp: entry.timestamp,
+      isDeload: !!entry.isDeloadMode,
+      unit: entry.weightUnit || state.weightUnit || 'kg',
+      set1_weight: set1Weight,
+      set1_reps: set1Reps,
+      set1_rir: set1Rir,
+      e1rm: e1rm,
+      total_volume: totalVolume,
+      setsCount: completedSets.length
+    });
+  });
+
+  return points;
+}
+
+function generateProgressionSvg(points, metricKey, unit) {
+  const width = 600;
+  const height = 280;
+  const padding = { top: 35, right: 35, bottom: 45, left: 60 };
+  const plotW = width - padding.left - padding.right;
+  const plotH = height - padding.top - padding.bottom;
+
+  const values = points.map(p => p[metricKey]);
+  let minVal = Math.min(...values);
+  let maxVal = Math.max(...values);
+
+  if (minVal === maxVal) {
+    minVal = Math.max(0, minVal - 5);
+    maxVal = maxVal + 5;
+  } else {
+    const range = maxVal - minVal;
+    minVal = Math.max(0, minVal - range * 0.15);
+    maxVal = maxVal + range * 0.15;
+  }
+
+  const gridLines = [];
+  const numGrid = 4;
+  for (let i = 0; i <= numGrid; i++) {
+    const yVal = minVal + ((maxVal - minVal) * (i / numGrid));
+    const yPos = padding.top + plotH - ((yVal - minVal) / (maxVal - minVal)) * plotH;
+    gridLines.push({ y: yPos, label: `${Math.round(yVal * 10) / 10}` });
+  }
+
+  const coords = points.map((p, idx) => {
+    const x = points.length === 1
+      ? padding.left + plotW / 2
+      : padding.left + (idx / (points.length - 1)) * plotW;
+    const y = padding.top + plotH - ((p[metricKey] - minVal) / (maxVal - minVal)) * plotH;
+    return { x, y, point: p, index: idx };
+  });
+
+  const polylineStr = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+
+  const areaPolygonStr = [
+    `${coords[0].x.toFixed(1)},${(padding.top + plotH).toFixed(1)}`,
+    polylineStr,
+    `${coords[coords.length - 1].x.toFixed(1)},${(padding.top + plotH).toFixed(1)}`
+  ].join(' ');
+
+  let svg = `
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Grafico de progresion">
+      <defs>
+        <linearGradient id="progressionGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32" />
+          <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0.0" />
+        </linearGradient>
+      </defs>
+
+      <!-- Gridlines & Y-Axis Labels -->
+      <g class="chart-grid">
+  `;
+
+  gridLines.forEach(g => {
+    svg += `
+      <line x1="${padding.left}" y1="${g.y.toFixed(1)}" x2="${padding.left + plotW}" y2="${g.y.toFixed(1)}" stroke="var(--color-rule)" stroke-dasharray="3 3" stroke-width="1" />
+      <text x="${padding.left - 10}" y="${(g.y + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--color-muted)" font-family="var(--font-body)">${g.label}</text>
+    `;
+  });
+
+  svg += `
+      </g>
+
+      <!-- Area fill & Line -->
+      <polygon points="${areaPolygonStr}" fill="url(#progressionGradient)" />
+      <polyline points="${polylineStr}" fill="none" stroke="var(--color-accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Data points & hit targets -->
+      <g class="chart-points">
+  `;
+
+  coords.forEach(c => {
+    const isSelected = state.progression?.selectedPointIndex === c.index;
+    svg += `
+      <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${isSelected ? 7 : 5}" fill="var(--color-paper-2)" stroke="${isSelected ? 'var(--color-light)' : 'var(--color-accent)'}" stroke-width="${isSelected ? 3.5 : 2.5}" />
+      <text x="${c.x.toFixed(1)}" y="${(padding.top + plotH + 20).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--color-muted)" font-family="var(--font-body)">${c.point.date.slice(0, 5)}</text>
+      <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="24" fill="transparent" class="chart-hit-circle" data-chart-index="${c.index}" aria-label="Punto ${c.point.date}: ${c.point[metricKey]} ${unit}" />
+    `;
+  });
+
+  svg += `
+      </g>
+    </svg>
+  `;
+
+  return svg;
+}
+
+function renderProgressionView() {
+  const container = document.getElementById('historyChartsView');
+  if (!container) return;
+
+  if (!state.progression) {
+    state.progression = {
+      exerciseId: null,
+      metric: 'set1_weight',
+      selectedPointIndex: null
+    };
+  }
+
+  const exercises = getAllExercisesList();
+
+  if (!state.progression.exerciseId) {
+    const exerciseWithHistory = exercises.find(ex => {
+      const data = getExerciseHistoryData(ex.id);
+      return data.length > 0;
+    });
+    state.progression.exerciseId = exerciseWithHistory ? exerciseWithHistory.id : (exercises[0]?.id || '');
+  }
+
+  const selectedEx = exercises.find(e => e.id === state.progression.exerciseId) || exercises[0];
+  const historyData = selectedEx ? getExerciseHistoryData(selectedEx.id) : [];
+
+  let html = `
+    <div class="chart-controls">
+      <div class="chart-select-group">
+        <label for="historyExerciseSelect" class="chart-label">Ejercicio a analizar</label>
+        <select id="historyExerciseSelect" class="chart-select">
+  `;
+
+  exercises.forEach(ex => {
+    const pointsCount = getExerciseHistoryData(ex.id).length;
+    const badge = pointsCount > 0 ? ` (${pointsCount} sesiones)` : '';
+    const selected = ex.id === state.progression.exerciseId ? 'selected' : '';
+    html += `<option value="${ex.id}" ${selected}>${ex.name}${badge}</option>`;
+  });
+
+  html += `
+        </select>
+      </div>
+
+      <div class="chart-select-group">
+        <span class="chart-label">Métrica de progresión</span>
+        <div class="chart-metric-pills" role="group" aria-label="Métrica de progresión">
+          <button class="metric-pill-btn ${state.progression.metric === 'set1_weight' ? 'active' : ''}" data-metric="set1_weight">
+            Peso Top Set
+          </button>
+          <button class="metric-pill-btn ${state.progression.metric === 'e1rm' ? 'active' : ''}" data-metric="e1rm">
+            1RM Estimado
+          </button>
+          <button class="metric-pill-btn ${state.progression.metric === 'total_volume' ? 'active' : ''}" data-metric="total_volume">
+            Volumen Total
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (historyData.length === 0) {
+    html += `
+      <div class="history-empty">
+        <div class="history-empty-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <p class="history-empty-title">Sin datos para este ejercicio</p>
+        <p class="history-empty-desc">Completa un entrenamiento que incluya <strong>${selectedEx ? selectedEx.name : 'este ejercicio'}</strong> para visualizar su curva de progresión.</p>
+      </div>
+    `;
+    container.innerHTML = html;
+    bindProgressionEvents(container);
+    return;
+  }
+
+  const unit = historyData[historyData.length - 1]?.unit || state.weightUnit || 'kg';
+  const metric = state.progression.metric || 'set1_weight';
+
+  const firstVal = historyData[0][metric];
+  const lastVal = historyData[historyData.length - 1][metric];
+  const maxVal = Math.max(...historyData.map(d => d[metric]));
+  const diffVal = Math.round((lastVal - firstVal) * 10) / 10;
+  const pctDiff = firstVal > 0 ? Math.round(((lastVal - firstVal) / firstVal) * 1000) / 10 : 0;
+  const diffSign = diffVal > 0 ? '+' : '';
+
+  html += `
+    <div class="chart-svg-container">
+      ${generateProgressionSvg(historyData, metric, unit)}
+    </div>
+
+    <div class="chart-stats-grid">
+      <div class="chart-stat-card">
+        <span class="chart-stat-label">Carga Inicial</span>
+        <span class="chart-stat-value">${firstVal} ${unit}</span>
+      </div>
+      <div class="chart-stat-card">
+        <span class="chart-stat-label">Máximo Logrado</span>
+        <span class="chart-stat-value accent">${maxVal} ${unit}</span>
+      </div>
+      <div class="chart-stat-card">
+        <span class="chart-stat-label">Progreso Neto</span>
+        <span class="chart-stat-value ${diffVal >= 0 ? 'positive' : ''}">${diffSign}${diffVal} ${unit} (${diffSign}${pctDiff}%)</span>
+      </div>
+    </div>
+  `;
+
+  const selectedIndex = (state.progression.selectedPointIndex !== null && state.progression.selectedPointIndex < historyData.length)
+    ? state.progression.selectedPointIndex
+    : historyData.length - 1;
+  const selPoint = historyData[selectedIndex];
+
+  if (selPoint) {
+    html += `
+      <div class="chart-tooltip-card" id="chartPointDetail">
+        <div class="chart-tooltip-header">
+          <span>${selPoint.date}</span>
+          ${selPoint.isDeload ? '<span class="history-badge deload">Deload</span>' : ''}
+        </div>
+        <div>
+          <strong>Top Set (Serie 1):</strong> ${selPoint.set1_weight} ${selPoint.unit} × ${selPoint.set1_reps} reps
+          ${selPoint.set1_rir !== null ? `(${selPoint.set1_rir} RIR)` : ''}
+        </div>
+        <div>
+          <strong>1RM Estimado:</strong> ${selPoint.e1rm} ${selPoint.unit} | <strong>Volumen Total:</strong> ${selPoint.total_volume} ${selPoint.unit}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+  bindProgressionEvents(container);
+}
+
+function bindProgressionEvents(container) {
+  const select = container.querySelector('#historyExerciseSelect');
+  if (select) {
+    select.onchange = (e) => {
+      state.progression.exerciseId = e.target.value;
+      state.progression.selectedPointIndex = null;
+      renderProgressionView();
+    };
+  }
+
+  container.querySelectorAll('.metric-pill-btn').forEach(btn => {
+    btn.onclick = () => {
+      const metric = btn.getAttribute('data-metric');
+      if (metric) {
+        state.progression.metric = metric;
+        renderProgressionView();
+      }
+    };
+  });
+
+  container.querySelectorAll('.chart-hit-circle').forEach(circle => {
+    circle.onclick = () => {
+      const idx = parseInt(circle.getAttribute('data-chart-index'), 10);
+      if (!isNaN(idx)) {
+        state.progression.selectedPointIndex = idx;
+        renderProgressionView();
+      }
     };
   });
 }
