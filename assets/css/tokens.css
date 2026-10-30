@@ -1,7 +1,8 @@
-/* hallmark: lumen: night · theme Lumen / Kiln · vintage-dark · restyle · 2026-10-30 */
+/* Hallmark · shape: app screen · genre: editorial · theme: Training ledger (by request) · v2.0.0 */
+/* Critique: paper surfaces and ruled rows replace dark panels; numeric fields retain strong edges. */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --space-3xs: 2px;
   --space-2xs: 4px;
   --space-xs: 8px;
@@ -34,12 +35,12 @@
   --dur-short: 220ms;
   --dur-long: 420ms;
 
-  --color-error: oklch(72% 0.15 27);
-  --color-error-bg: oklch(25% 0.05 27);
-  --color-error-rule: oklch(40% 0.10 27);
-  --color-success: oklch(76% 0.13 145);
-  --color-success-bg: oklch(24% 0.04 145);
-  --color-success-rule: oklch(42% 0.08 145);
+  --color-error: #922f30;
+  --color-error-bg: #f6e6df;
+  --color-error-rule: #b16b62;
+  --color-success: #305c42;
+  --color-success-bg: #e5ebdb;
+  --color-success-rule: #6b886b;
 
   --container: 1440px;
   --gutter: 64px;
@@ -57,40 +58,40 @@
   --z-toast: 500;
   --z-tooltip: 600;
 
-  /* Golden Era / Vintage Dark Grounds */
-  --color-paper: oklch(13.5% 0.015 50);
-  --color-paper-2: oklch(17.5% 0.018 50);
-  --color-paper-3: oklch(22% 0.022 50);
-  --color-paper-4: oklch(27% 0.025 50);
+  /* Ivory leaves on a bookcloth ground. */
+  --color-paper: #f4eddf;
+  --color-paper-2: #fcf8ee;
+  --color-paper-3: #eae1d0;
+  --color-paper-4: #dfd3bd;
+  --color-desk: #d8cebb;
 
-  /* Warm Cream & Parchment Inks */
-  --color-ink: oklch(94.5% 0.018 80);
-  --color-ink-2: oklch(85% 0.022 75);
-  --color-muted: oklch(71% 0.028 65);
-  --color-faint: oklch(64% 0.026 64);
+  --color-ink: #302a24;
+  --color-ink-2: #494036;
+  --color-muted: #665b4e;
+  --color-faint: #736655;
 
-  --color-rule: oklch(96% 0.01 80 / 0.12);
-  --color-rule-strong: oklch(96% 0.01 80 / 0.45); /* visible control edge, >=3:1 on paper-3 */
-  --color-rule-focus: oklch(74% 0.17 62);
-  --color-light: oklch(98.5% 0.01 80);
-  --color-shade: oklch(9% 0.015 50);
-  --color-overlay: oklch(9% 0.015 50 / 0.88);
+  --color-rule: #c9bca6;
+  --color-rule-strong: #8a7b65;
+  --color-rule-focus: #772f3b;
+  --color-light: #302a24;
+  --color-shade: #fffdf7;
+  --color-overlay: #302a24b8;
+  --color-shadow: #302a2426;
 
-  /* Antique Bronze & Molten Gold Accent */
-  --color-accent: oklch(74% 0.17 62);
-  --color-accent-ink: oklch(13% 0.02 50);
-  --color-accent-hi: oklch(82% 0.14 65);
-  --color-accent-deep: oklch(45% 0.14 55);
-  --color-accent-soft: oklch(90% 0.035 65);
-  --color-accent-bg: oklch(22% 0.04 60);
-  --color-accent-rule: oklch(44% 0.09 60);
-  --color-focus: oklch(76% 0.17 62);
+  /* Burgundy ink for actions and the selected training day. */
+  --color-accent: #772f3b;
+  --color-accent-ink: #fff8ec;
+  --color-accent-hi: #59212c;
+  --color-accent-deep: #59212c;
+  --color-accent-soft: #f0ddd6;
+  --color-accent-bg: #f0e1d9;
+  --color-accent-rule: #9c6265;
+  --color-focus: #772f3b;
 
-  /* Terracotta / Oxblood Secondary */
-  --color-accent-2: oklch(75% 0.14 35);
-  --color-accent-2-bg: oklch(24% 0.04 35);
-  --color-accent-2-rule: oklch(44% 0.08 35);
-  --color-dusk: oklch(70% 0.12 35);
+  --color-accent-2: #744d2c;
+  --color-accent-2-bg: #eee3ce;
+  --color-accent-2-rule: #a48b63;
+  --color-dusk: #744d2c;
 
   --color-day-ink: oklch(22% 0.022 50);
   --color-day-muted: oklch(38% 0.022 50);
@@ -108,10 +109,15 @@
   --font-body: "Geist", "Wix Madefor Text", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
-  --radius-card: 14px;
-  --radius-inner: 8px;
-  --radius-pill: 999px;
+  --radius-card: 2px;
+  --radius-inner: 2px;
+  --radius-pill: 2px;
   --rule-hair: 1px;
+  --rule-heavy: 3px;
+  --control-size: 44px;
+  --ledger-width: 1080px;
+  --ledger-mobile-width: 560px;
+  --shadow-sheet: 0 var(--space-xs) var(--space-xl) var(--color-shadow);
 
   --tracking-display: -0.015em;
   --display-weight: 400;

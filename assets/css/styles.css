@@ -1,7 +1,6 @@
-/* Hallmark · shape: app screen · genre: atmospheric · theme: Lumen / Kiln (Golden Era Iron) · redesign: restyle
- * nav: tabs · signature: ddp-top-set-tracker · states: 8 · dark-vintage: espresso-cream-bronze
- * axes: dark/roman-serif/warm · posture: restrained · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: prior P8 H8 E8 S9 R8 V8 kept as baseline, not re-scored this pass · fixed: display-scale h1, token-strong field edges, 44px targets down to 320px via Previa column drop, chevron affordance on drawers · weakest still: E (drawer density) */
+/* Hallmark · shape: app screen · genre: editorial · theme: Training ledger (by request)
+ * nav: training-day tabs · signature: numbered ruled exercise ledger · v2.0.0 */
+/* Critique: retain fast set entry; replace floating dark panels with a compact ink-on-paper training book. */
 @import url("./tokens.css");
 @import url("./base.css");
 
@@ -1800,3 +1799,134 @@ input:checked + .slider:before {
   color: var(--color-accent);
 }
 
+/* Training ledger: existing controls and data retain their original wiring. */
+html { background: var(--color-desk); }
+body { min-height: 100dvh; }
+
+.app-header {
+  position: relative;
+  padding-block: calc(var(--space-lg) + env(safe-area-inset-top, 0px)) var(--space-lg);
+  border-bottom: var(--rule-heavy) double var(--color-ink);
+  gap: var(--space-sm);
+}
+.header-left { min-width: 0; gap: var(--space-sm); }
+.header-titles { min-width: 0; }
+.header-titles h1 { font-size: var(--text-3xl); }
+.sub-title { margin-top: var(--space-2xs); }
+.header-actions { display: flex; gap: var(--space-xs); flex-shrink: 0; }
+.app-logo {
+  width: var(--control-size);
+  height: var(--control-size);
+  flex-shrink: 0;
+  border-color: var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+}
+.icon-btn { background: transparent; border-color: var(--color-rule-strong); }
+
+.session-tabs {
+  gap: 0;
+  margin: var(--space-md);
+  padding: 0;
+  border: var(--rule-hair) solid var(--color-rule-strong);
+}
+.tab-btn {
+  border: 0;
+  border-right: var(--rule-hair) solid var(--color-rule);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--space-sm) var(--space-2xs);
+  gap: var(--space-3xs);
+  transition: transform var(--dur-micro) var(--ease-out);
+}
+.tab-btn:last-child { border-right: 0; }
+.tab-btn.active { background: var(--color-accent); }
+.tab-btn.active .tab-name, .tab-btn.active .tab-day { color: var(--color-accent-ink); }
+
+.session-summary-card {
+  background: transparent;
+  border: 0;
+  border-bottom: var(--rule-hair) solid var(--color-rule-strong);
+  padding: var(--space-xs) 0 var(--space-lg);
+  border-radius: 0;
+}
+.summary-top { flex-wrap: wrap; gap: var(--space-sm); }
+.summary-top h2 { font-size: var(--text-2xl); }
+.summary-focus { line-height: 1.6; }
+.summary-metrics { gap: var(--space-xs); }
+.metric-pill { background: transparent; border-color: var(--color-rule); }
+.btn-primary { border-color: var(--color-accent); }
+.btn-primary:hover { background: var(--color-accent-hi); opacity: 1; }
+.btn-secondary { background: transparent; border-color: var(--color-rule-strong); }
+
+.exercises-container { counter-reset: exercise; gap: var(--space-lg); }
+.exercise-card {
+  counter-increment: exercise;
+  border-color: var(--color-rule-strong);
+  border-top: var(--rule-heavy) solid var(--color-ink);
+}
+.exercise-card:hover { border-color: var(--color-rule-strong); border-top-color: var(--color-ink); }
+.exercise-top-row { justify-content: flex-start; gap: var(--space-sm); }
+.exercise-top-row::before {
+  content: counter(exercise, decimal-leading-zero);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.exercise-title { font-size: var(--text-xl); }
+.exercise-header { padding-bottom: var(--space-xs); }
+.target-rir { padding: 0; background: transparent; }
+.target-rest { color: var(--color-muted); }
+.technique-badge { background: transparent; }
+.btn-accordion { color: var(--color-muted); }
+.sets-table { padding-top: var(--space-xs); }
+.table-header { padding-bottom: var(--space-xs); color: var(--color-muted); }
+.set-row {
+  border-top: var(--rule-hair) solid var(--color-rule);
+  border-radius: 0;
+  padding-block: var(--space-xs);
+  margin-bottom: 0;
+}
+.set-col-prev { background: transparent; }
+.set-input { font-weight: 500; font-variant-numeric: tabular-nums; }
+.set-check-btn { background: transparent; }
+.set-row.completed .set-check-btn { background: var(--color-success-bg); }
+.set-row:not(.completed) .set-check-btn::before { opacity: 1; }
+
+.timer-bar {
+  border-color: var(--color-ink);
+  border-top-width: var(--rule-heavy);
+  box-shadow: var(--shadow-sheet);
+}
+.timer-clock { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 400; }
+.modal-card { border-top: var(--rule-heavy) solid var(--color-ink); }
+.modal-header h3 { font-size: var(--text-xl); }
+.history-card { background: transparent; border-width: 0 0 var(--rule-hair); border-radius: 0; }
+.history-card-title { font-size: var(--text-lg); }
+.chart-stat-card { background: transparent; border-width: 0 0 var(--rule-hair); border-radius: 0; }
+.sub-custom-input { min-width: 0; font-size: var(--text-md); }
+.switch { height: var(--control-size); }
+.slider { top: var(--space-xs); bottom: var(--space-xs); }
+
+@media (max-width: 400px) {
+  .app-header { gap: var(--space-xs); }
+  .app-logo { display: none; }
+  .header-titles h1 { font-size: var(--text-2xl); }
+}
+
+@media (min-width: 600px) {
+  body { max-width: var(--ledger-mobile-width); box-shadow: var(--shadow-sheet); }
+}
+
+@media (min-width: 1100px) {
+  body { max-width: min(var(--ledger-width), calc(100% - var(--space-xl))); }
+  .app-header { padding-inline: var(--space-lg); }
+  .header-titles h1 { font-size: var(--text-3xl); }
+  .session-tabs { margin: var(--space-lg); }
+  .session-summary-card { margin-inline: var(--space-lg); }
+  .summary-top { display: block; }
+  .summary-metrics { margin-top: var(--space-sm); }
+  .exercises-container { padding-inline: var(--space-lg); gap: var(--space-lg); }
+}
