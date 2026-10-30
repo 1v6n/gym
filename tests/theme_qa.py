@@ -25,6 +25,7 @@ def run_tests():
                     return page.evaluate('getComputedStyle(document.documentElement).colorScheme')
 
                 assert scheme() == 'light'
+                assert page.locator('body').evaluate('(el) => getComputedStyle(el).backgroundColor') == 'rgb(244, 237, 223)'
                 assert page.locator('#themeSelect').input_value() == 'system'
                 assert 'Georgia' in page.locator('h1').evaluate('(el) => getComputedStyle(el).fontFamily')
                 assert page.locator('link[href*="fonts.googleapis.com"]').count() == 0
@@ -42,6 +43,8 @@ def run_tests():
                 page.locator('#btnSettings').click()
                 page.locator('#themeSelect').select_option('dark')
                 assert scheme() == 'dark'
+                assert page.locator('body').evaluate('(el) => getComputedStyle(el).backgroundColor') == 'rgb(27, 36, 48)'
+                assert page.locator('.tab-btn.active').evaluate('(el) => getComputedStyle(el).backgroundColor') == 'rgb(163, 191, 216)'
                 page.emulate_media(color_scheme='light')
                 assert scheme() == 'dark'
                 page.reload()

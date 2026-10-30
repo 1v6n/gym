@@ -123,42 +123,42 @@
   --display-weight: 400;
 }
 
-/* Paired inks preserve the ledger's warm character in either appearance. */
+/* Ivory ledger by day; midnight slate and dusty blue after dark. */
 :root {
-  --color-paper: light-dark(#f4eddf, #211e1b);
-  --color-paper-2: light-dark(#fcf8ee, #292520);
-  --color-paper-3: light-dark(#eae1d0, #353029);
-  --color-paper-4: light-dark(#dfd3bd, #433b32);
-  --color-desk: light-dark(#d8cebb, #171513);
-  --color-ink: light-dark(#302a24, #f4eddf);
-  --color-ink-2: light-dark(#494036, #e1d5c2);
-  --color-muted: light-dark(#665b4e, #bfb19d);
-  --color-faint: light-dark(#736655, #b4a48c);
-  --color-rule: light-dark(#c9bca6, #625747);
-  --color-rule-strong: light-dark(#8a7b65, #97866d);
-  --color-rule-focus: light-dark(#772f3b, #e1a3aa);
-  --color-light: light-dark(#302a24, #fff8ec);
-  --color-shade: light-dark(#fffdf7, #1b1916);
-  --color-overlay: light-dark(#302a24b8, #100e0cdb);
+  --color-paper: light-dark(#f4eddf, #1b2430);
+  --color-paper-2: light-dark(#fcf8ee, #222e3b);
+  --color-paper-3: light-dark(#eae1d0, #2c3b4b);
+  --color-paper-4: light-dark(#dfd3bd, #384b5e);
+  --color-desk: light-dark(#d8cebb, #131b25);
+  --color-ink: light-dark(#302a24, #eceff1);
+  --color-ink-2: light-dark(#494036, #d1dbe4);
+  --color-muted: light-dark(#665b4e, #afbfce);
+  --color-faint: light-dark(#736655, #a0b2c4);
+  --color-rule: light-dark(#c9bca6, #4b6074);
+  --color-rule-strong: light-dark(#8a7b65, #8096ab);
+  --color-rule-focus: light-dark(#772f3b, #a3bfd8);
+  --color-light: light-dark(#302a24, #f5f7f9);
+  --color-shade: light-dark(#fffdf7, #16202b);
+  --color-overlay: light-dark(#302a24b8, #0b121bdb);
   --color-shadow: light-dark(#302a2426, #00000059);
-  --color-accent: light-dark(#772f3b, #e1a3aa);
-  --color-accent-ink: light-dark(#fff8ec, #2b171c);
-  --color-accent-hi: light-dark(#59212c, #edbcc1);
-  --color-accent-deep: light-dark(#59212c, #edbcc1);
-  --color-accent-soft: light-dark(#f0ddd6, #493036);
-  --color-accent-bg: light-dark(#f0e1d9, #3a292b);
-  --color-accent-rule: light-dark(#9c6265, #ae7b80);
-  --color-focus: light-dark(#772f3b, #e1a3aa);
-  --color-accent-2: light-dark(#744d2c, #d9b789);
-  --color-accent-2-bg: light-dark(#eee3ce, #352e23);
-  --color-accent-2-rule: light-dark(#a48b63, #a48b63);
-  --color-dusk: light-dark(#744d2c, #d9b789);
-  --color-error: light-dark(#922f30, #f0a39b);
-  --color-error-bg: light-dark(#f6e6df, #402b28);
-  --color-error-rule: light-dark(#b16b62, #b16b62);
-  --color-success: light-dark(#305c42, #adc79d);
-  --color-success-bg: light-dark(#e5ebdb, #283327);
-  --color-success-rule: light-dark(#6b886b, #829d7c);
+  --color-accent: light-dark(#772f3b, #a3bfd8);
+  --color-accent-ink: light-dark(#fff8ec, #182431);
+  --color-accent-hi: light-dark(#59212c, #bfd2e3);
+  --color-accent-deep: light-dark(#59212c, #bfd2e3);
+  --color-accent-soft: light-dark(#f0ddd6, #344c63);
+  --color-accent-bg: light-dark(#f0e1d9, #2b4055);
+  --color-accent-rule: light-dark(#9c6265, #7e9db9);
+  --color-focus: light-dark(#772f3b, #a3bfd8);
+  --color-accent-2: light-dark(#744d2c, #b6c9db);
+  --color-accent-2-bg: light-dark(#eee3ce, #2a3b4d);
+  --color-accent-2-rule: light-dark(#a48b63, #7e96ad);
+  --color-dusk: light-dark(#744d2c, #b6c9db);
+  --color-error: light-dark(#922f30, #e3aaa9);
+  --color-error-bg: light-dark(#f6e6df, #3b2e38);
+  --color-error-rule: light-dark(#b16b62, #a47980);
+  --color-success: light-dark(#305c42, #a6c9be);
+  --color-success-bg: light-dark(#e5ebdb, #263d3c);
+  --color-success-rule: light-dark(#6b886b, #779e92);
 }
 
 @media (prefers-color-scheme: dark) {
