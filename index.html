@@ -12,9 +12,6 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./assets/icons/icon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
@@ -182,6 +179,18 @@
           <button class="modal-close" data-close-modal aria-label="Cerrar">&times;</button>
         </div>
         <div class="modal-body">
+          <div class="setting-item">
+            <div>
+              <label class="setting-title" for="themeSelect">Apariencia</label>
+              <span class="setting-desc" id="themeStatus" role="status">Claro, oscuro o según tu dispositivo</span>
+            </div>
+            <select id="themeSelect" class="chart-select" aria-describedby="themeStatus">
+              <option value="system">Sistema</option>
+              <option value="light">Claro</option>
+              <option value="dark">Oscuro</option>
+            </select>
+          </div>
+
           <div class="setting-item">
             <div>
               <span class="setting-title">Unidad de peso</span>

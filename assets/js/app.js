@@ -561,6 +561,7 @@ const state = {
   weightUnit: 'kg', // 'kg' or 'lbs'
   isDeloadMode: false,
   audioVibrate: true,
+  theme: 'system',
   logs: {},
   history: [],
   draft: {},
@@ -672,6 +673,7 @@ function loadState() {
       state.weightUnit = parsed.weightUnit || 'kg';
       state.isDeloadMode = !!parsed.isDeloadMode;
       state.audioVibrate = parsed.audioVibrate !== false;
+      state.theme = ['light', 'dark'].includes(parsed.theme) ? parsed.theme : 'system';
     }
   } catch (err) {
     console.warn('Corrupted settings in storage, using defaults:', err);
@@ -711,11 +713,24 @@ function saveHistory() {
 }
 
 function saveSettings() {
-  saveStorageItem(STORAGE_KEYS.SETTINGS, {
+  return saveStorageItem(STORAGE_KEYS.SETTINGS, {
     weightUnit: state.weightUnit,
     isDeloadMode: state.isDeloadMode,
-    audioVibrate: state.audioVibrate
+    audioVibrate: state.audioVibrate,
+    theme: state.theme
   });
+}
+
+function applyTheme() {
+  if (state.theme === 'system') {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = state.theme;
+  }
+  const select = document.getElementById('themeSelect');
+  if (select) select.value = state.theme;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
 }
 
 function saveDraft() {
@@ -1435,6 +1450,20 @@ function setupGlobalListeners() {
   });
 
   const btnUnitKg = document.getElementById('btnUnitKg');
+  const themeSelect = document.getElementById('themeSelect');
+  if (themeSelect) {
+    themeSelect.onchange = () => {
+      state.theme = themeSelect.value;
+      applyTheme();
+      const saved = saveSettings();
+      document.getElementById('themeStatus').textContent = saved
+        ? 'Claro, oscuro o según tu dispositivo'
+        : 'No se pudo guardar. Se aplicará solo en esta sesión.';
+    };
+  }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.theme === 'system') applyTheme();
+  });
   const btnUnitLbs = document.getElementById('btnUnitLbs');
   if (btnUnitKg && btnUnitLbs) {
     btnUnitKg.onclick = () => {
@@ -2172,7 +2201,8 @@ function exportJsonBackup() {
     settings: {
       weightUnit: state.weightUnit,
       isDeloadMode: state.isDeloadMode,
-      audioVibrate: state.audioVibrate
+      audioVibrate: state.audioVibrate,
+      theme: state.theme
     }
   }, null, 2));
 
@@ -2204,6 +2234,9 @@ function importJsonBackup(event) {
         state.weightUnit = imported.settings.weightUnit || 'kg';
         state.isDeloadMode = !!imported.settings.isDeloadMode;
         state.audioVibrate = imported.settings.audioVibrate !== false;
+        state.theme = ['light', 'dark', 'system'].includes(imported.settings.theme)
+          ? imported.settings.theme : state.theme;
+        applyTheme();
         saveSettings();
       }
       renderSession();
@@ -2241,6 +2274,7 @@ function registerServiceWorker() {
 
 window.addEventListener('DOMContentLoaded', () => {
   loadState();
+  applyTheme();
   setupGlobalListeners();
   renderSession();
   registerServiceWorker();
