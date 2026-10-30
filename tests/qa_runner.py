@@ -97,13 +97,13 @@ def run_tests():
         unit_pill = page.locator("#currentUnitPill").inner_text()
         cards_count = page.locator(".exercise-card").count()
         
-        upper_a_pass = (title_text == "Upper A: Horizontal Push y Vertical Pull") and \
-                       (sets_count == "19 series") and \
+        upper_a_pass = (title_text == "Upper A: Horizontal Push & Vertical Pull") and \
+                       (sets_count == "19 sets") and \
                        (unit_pill == "kg") and \
                        (cards_count == 7)
         record_result("Initial Load & Upper A Setup", upper_a_pass,
                       f"Title: '{title_text}', Sets: '{sets_count}', Unit: '{unit_pill}', Exercises: {cards_count}",
-                      defect="HTML hardcodes '18 series' in #totalSetsCount, but app.js correctly renders and calculates 19 series (3+3+3+3+3+2+2) for Upper A." if sets_count != "19 series" else None)
+                      defect="HTML hardcodes '18 sets' in #totalSetsCount, but app.js correctly renders and calculates 19 sets (3+3+3+3+3+2+2) for Upper A." if sets_count != "19 sets" else None)
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_initial_upper_a.png")
 
         # ---------------------------------------------------------
@@ -115,7 +115,7 @@ def run_tests():
         la_title = page.locator("#sessionTitle").inner_text()
         la_sets = page.locator("#totalSetsCount").inner_text()
         la_cards = page.locator(".exercise-card").count()
-        la_pass = (la_title == "Lower A: Quad Bias y Knee Flexion") and (la_sets == "13 series") and (la_cards == 5)
+        la_pass = (la_title == "Lower A: Quad Bias & Knee Flexion") and (la_sets == "13 sets") and (la_cards == 5)
         record_result("Tab Navigation: Lower A", la_pass, f"Title: '{la_title}', Sets: '{la_sets}', Cards: {la_cards}")
         page.screenshot(path=f"{SCREENSHOT_DIR}/02_tab_lower_a.png")
 
@@ -125,7 +125,7 @@ def run_tests():
         ub_title = page.locator("#sessionTitle").inner_text()
         ub_sets = page.locator("#totalSetsCount").inner_text()
         ub_cards = page.locator(".exercise-card").count()
-        ub_pass = (ub_title == "Upper B: Vertical Push y Horizontal Pull") and (ub_sets == "19 series") and (ub_cards == 7)
+        ub_pass = (ub_title == "Upper B: Vertical Push & Horizontal Pull") and (ub_sets == "19 sets") and (ub_cards == 7)
         record_result("Tab Navigation: Upper B", ub_pass, f"Title: '{ub_title}', Sets: '{ub_sets}', Cards: {ub_cards}")
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_tab_upper_b.png")
 
@@ -135,7 +135,7 @@ def run_tests():
         lb_title = page.locator("#sessionTitle").inner_text()
         lb_sets = page.locator("#totalSetsCount").inner_text()
         lb_cards = page.locator(".exercise-card").count()
-        lb_pass = (lb_title == "Lower B: Posterior Chain y Adductor Focus") and (lb_sets == "13 series") and (lb_cards == 5)
+        lb_pass = (lb_title == "Lower B: Posterior Chain & Adductor Focus") and (lb_sets == "13 sets") and (lb_cards == 5)
         record_result("Tab Navigation: Lower B", lb_pass, f"Title: '{lb_title}', Sets: '{lb_sets}', Cards: {lb_cards}")
         page.screenshot(path=f"{SCREENSHOT_DIR}/04_tab_lower_b.png")
 
@@ -143,7 +143,7 @@ def run_tests():
         page.locator("button[data-session='upperA']").click()
         page.wait_for_timeout(300)
         back_title = page.locator("#sessionTitle").inner_text()
-        record_result("Tab Navigation: Return to Upper A", back_title == "Upper A: Horizontal Push y Vertical Pull", f"Title: '{back_title}'")
+        record_result("Tab Navigation: Return to Upper A", back_title == "Upper A: Horizontal Push & Vertical Pull", f"Title: '{back_title}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/05_back_to_upper_a.png")
 
         # ---------------------------------------------------------
@@ -157,7 +157,7 @@ def run_tests():
 
         started_label = lbl_workout.inner_text()
         btn_classes = workout_btn.get_attribute("class") or ""
-        started_pass = (started_label == "Finalizar sesion") and ("active-workout" in btn_classes)
+        started_pass = (started_label == "Finish workout") and ("active-workout" in btn_classes)
         record_result("Start Workout Toggle", started_pass, f"Label: '{initial_label}' -> '{started_label}', Class: '{btn_classes}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/06_workout_started.png")
 
@@ -190,9 +190,9 @@ def run_tests():
         ceiling_pass = ("completed" in row_0_class) and \
                        (check_0_text == "✓") and \
                        (not banner_hidden) and \
-                       ("Techo alcanzado en Serie 1" in banner_text) and \
+                       ("Ceiling hit on Set 1" in banner_text) and \
                        ("insight-ceiling" in insight_0_classes) and \
-                       ("+0.8 a +1.5 kg" in insight_0_text)
+                       ("+0.8 to +1.5 kg" in insight_0_text)
 
         record_result("Set 1 DDP Ceiling Trigger (8 reps -> +2.5% to 5% alert)",
                       ceiling_pass,
@@ -271,8 +271,8 @@ def run_tests():
         insight_1_text = insight_1.inner_text()
 
         drop_pass = ("insight-floor" in insight_1_classes) and \
-                    ("Caida por fatiga" in insight_1_text) and \
-                    ("5% y 10%" in insight_1_text) and \
+                    ("Fatigue drop-off" in insight_1_text) and \
+                    ("5% to 10%" in insight_1_text) and \
                     ("-2.3 kg" in insight_1_text)
 
         record_result("Set Drop-off Alert (<6 reps triggers fatigue alert & -5% to 10% load reduction)",
@@ -328,12 +328,12 @@ def run_tests():
         page.locator(".sub-option-item:has-text('Barbell Flat Bench Press') .btn-sub-select").click()
         page.wait_for_timeout(300)
 
-        # 2. Verify card title changes to 'Barbell Flat Bench Press' and .badge-sub displays 'Sustituto de: Flat Dumbbell Press'
+        # 2. Verify card title changes to 'Barbell Flat Bench Press' and .badge-sub displays 'Substitute for: Flat Dumbbell Press'
         card_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
         badge_el = page.locator("#card_flat_db_press .badge-sub")
         badge_count = badge_el.count()
         badge_text = badge_el.inner_text().strip() if badge_count > 0 else ""
-        sub_apply_pass = (card_title == "Barbell Flat Bench Press") and ("Sustituto de: Flat Dumbbell Press" in badge_text)
+        sub_apply_pass = (card_title == "Barbell Flat Bench Press") and ("Substitute for: Flat Dumbbell Press" in badge_text)
         record_result("Exercise Substitution: Predefined Swap to Barbell Flat Bench Press",
                       sub_apply_pass,
                       f"Card title: '{card_title}', Badge: '{badge_text}'")
@@ -364,7 +364,7 @@ def run_tests():
         custom_badge_el = page.locator("#card_flat_db_press .badge-sub")
         custom_badge_count = custom_badge_el.count()
         custom_badge_text = custom_badge_el.inner_text().strip() if custom_badge_count > 0 else ""
-        custom_pass = (custom_title == "Incline Hammer Strength Press") and ("Sustituto de: Flat Dumbbell Press" in custom_badge_text)
+        custom_pass = (custom_title == "Incline Hammer Strength Press") and ("Substitute for: Flat Dumbbell Press" in custom_badge_text)
         record_result("Exercise Substitution: Custom Substitute Input Applied",
                       custom_pass,
                       f"Custom title: '{custom_title}', Badge: '{custom_badge_text}'")
@@ -430,10 +430,10 @@ def run_tests():
 
         # In deload mode, plannedSets = Math.max(1, round(sets * 0.5)) -> 3 becomes 2 sets.
         # Upper A total sets: 5*2 + 2*1 = 12 sets.
-        deload_pass = ("Modo deload activo" in deload_status) and \
-                      ("3 a 4 RIR" in first_card_rir) and \
-                      ("2 series" in first_card_bracket) and \
-                      (deload_sets_count == "12 series")
+        deload_pass = ("Deload active" in deload_status) and \
+                      ("3 to 4 RIR" in first_card_rir) and \
+                      ("2 sets" in first_card_bracket) and \
+                      (deload_sets_count == "12 sets")
         record_result("Deload Mode Activation (50% volume, 3 to 4 RIR)", deload_pass,
                       f"Deload Status: '{deload_status}', Total sets: '{deload_sets_count}', First exercise: '{first_card_bracket}', RIR: '{first_card_rir}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/19_deload_mode_active.png")
@@ -457,10 +457,10 @@ def run_tests():
         page.locator("#btnToggleWorkout").click()
         page.wait_for_timeout(500)
 
-        # After finishing workout, check button reverts to "Iniciar entrenamiento"
+        # After finishing workout, check button reverts to "Start workout"
         final_btn_label = page.locator("#lblWorkoutAction").inner_text()
         final_workout_active = "active-workout" in (page.locator("#btnToggleWorkout").get_attribute("class") or "")
-        finish_pass = (final_btn_label == "Iniciar entrenamiento") and (not final_workout_active)
+        finish_pass = (final_btn_label == "Start workout") and (not final_workout_active)
         record_result("Workout Session Finish", finish_pass, f"Button label: '{final_btn_label}', active: {final_workout_active}")
 
         # Check that previous values ("Previa") column now shows the completed weights & reps!
@@ -543,11 +543,11 @@ def run_tests():
         page.locator("button[data-session='lowerA']").click()
         page.wait_for_timeout(300)
         la_workout_btn_label = page.locator("#lblWorkoutAction").inner_text()
-        tab_switch_active = (la_workout_btn_label == "Finalizar sesion")
+        tab_switch_active = (la_workout_btn_label == "Finish workout")
         record_result("Defect Investigation: Active Workout Cross-Tab State",
                       not tab_switch_active,
                       f"While Upper A workout was active, switching to Lower A tab displays button label: '{la_workout_btn_label}'.",
-                      defect="state.isWorkoutActive is a single global boolean. Switching tabs during an active workout leaves 'Finalizar sesion' active on any other tab and finishing it overwrites that tab's session." if tab_switch_active else None)
+                      defect="state.isWorkoutActive is a single global boolean. Switching tabs during an active workout leaves 'Finish workout' active on any other tab and finishing it overwrites that tab's session." if tab_switch_active else None)
         page.screenshot(path=f"{SCREENSHOT_DIR}/23_active_workout_cross_tab.png")
 
         # History Feature Tests

@@ -78,7 +78,7 @@ def run_tests():
                 }""")
                 page.locator('#themeSelect').select_option('dark')
                 assert scheme() == 'dark'
-                assert 'No se pudo guardar' in page.locator('#themeStatus').inner_text()
+                assert 'Could not save' in page.locator('#themeStatus').inner_text()
                 browser.close()
                 print('PASS: fonts, system appearance, overrides, persistence, offline, '
                       'responsive layout, corrupt settings, and storage failure fallback')

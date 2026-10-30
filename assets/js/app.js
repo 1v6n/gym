@@ -4,6 +4,9 @@
  * Follows Hallmark UI rules: no slop, accessible controls, clean copy.
  */
 
+(() => {
+  'use strict';
+
 // ============================================================================
 // 1. ROUTINE BLUEPRINT & EXERCISE DATABASE
 // ============================================================================
@@ -12,8 +15,8 @@ const ROUTINE_DATA = {
   upperA: {
     id: 'upperA',
     name: 'Upper A',
-    dayName: 'Lunes',
-    title: 'Upper A: Horizontal Push y Vertical Pull',
+    dayName: 'Monday',
+    title: 'Upper A: Horizontal Push & Vertical Pull',
     focus: 'Flat DB Press, Lat Pulldown, Incline Smith, Direct Arms',
     exercises: [
       {
@@ -28,9 +31,9 @@ const ROUTINE_DATA = {
         technique: {
           badge: 'Top set driver',
           badgeClass: 'badge-pause',
-          desc: 'La Serie 1 dicta la progresion de la semana. Manten 2 RIR para gestionar la fatiga axial.'
+          desc: 'Set 1 dictates weekly progression. Hold 2 RIR to manage axial fatigue.'
         },
-        cues: 'Escapulas retraidas y deprimidas contra la banca. Descenso profundo para maximo estiramiento pectoral; codos a 45 grados respecto al torso. Pausa de 1s en el fondo.',
+        cues: 'Retract and depress shoulder blades against the bench. Lower deep for maximum pectoral stretch with elbows at 45 degrees. Pause 1s at the bottom.',
         substitutions: [
           'Barbell Flat Bench Press',
           'Plate-Loaded Chest Press Machine',
@@ -43,17 +46,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [8, 10],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 120,
         isAxialCompound: false,
         technique: {
-          badge: 'Pausa de 2s en estiramiento',
+          badge: '2s stretch pause',
           badgeClass: 'badge-stretch',
-          desc: 'Pausa de 2 segundos en el estiramiento maximo arriba en cada repeticion.'
+          desc: 'Pause 2 seconds in the fully lengthened stretch at the top of every rep.'
         },
-        cues: 'Agarre neutro (palmas enfrentadas) a anchura de hombros. Deja que la escapula suba libremente arriba (2s pausa), y tracciona guiando con los codos hacia los bolsillos.',
+        cues: 'Shoulder-width neutral grip. Let shoulder blades elevate fully at the top (2s pause), then drive elbows down toward your back pockets.',
         substitutions: [
-          'Neutral-Grip Pull-ups (con lastre si es necesario)',
+          'Neutral-Grip Pull-ups (weighted if needed)',
           'Single-Arm Cable High Row',
           'Pronated Lat Pulldown'
         ]
@@ -64,17 +67,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [8, 10],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 120,
         isAxialCompound: false,
         technique: {
-          badge: 'Excentrica de 3s',
+          badge: '3s eccentric',
           badgeClass: 'badge-pause',
-          desc: 'Fase excentrica controlada en 3 segundos estrictos.'
+          desc: 'Lower under strict 3-second control on every rep.'
         },
-        cues: 'Inclinacion de banca a 30 grados para enfatizar el haz clavicular. Toca la barra suavemente en la parte alta del pecho y empuja sin bloquear codos agresivamente.',
+        cues: 'Set bench to 30 degrees to bias the clavicular head. Touch the bar softly to upper chest and press without harsh elbow lockout.',
         substitutions: [
-          'Incline Dumbbell Press 30 grados',
+          '30° Incline Dumbbell Press',
           'Incline Barbell Bench Press',
           'Incline Machine Chest Press'
         ]
@@ -89,11 +92,11 @@ const ROUTINE_DATA = {
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Enfoque en espalda alta',
+          badge: 'Upper back bias',
           badgeClass: 'badge-pause',
-          desc: 'Sin balanceo lumbar; tension mecanica pura en romboides y trapecio medio.'
+          desc: 'Zero lumbar momentum. Pure mechanical tension on rhomboids and mid-traps.'
         },
-        cues: 'Banca a 30 o 45 grados. Apoya el pecho firme. Abre los codos a 45 grados y aprieta escapulas en la cima durante 1 segundo antes de bajar con control.',
+        cues: 'Set bench to 30 or 45 degrees. Press chest firmly into pad. Flare elbows 45 degrees and squeeze shoulder blades for 1 second at the top before a controlled descent.',
         substitutions: [
           'Chest-Supported T-Bar Row',
           'Seated Wide-Grip Cable Row',
@@ -106,17 +109,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [12, 15],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 60,
         isAxialCompound: false,
         technique: {
-          badge: 'Rest-pause en serie 3',
+          badge: 'Rest-pause on Set 3',
           badgeClass: 'badge-rest-pause',
-          desc: 'En la Serie 3: llega al fallo (0 RIR), descansa 15s, saca 4 reps, descansa 15s, saca 3 reps.'
+          desc: 'On Set 3: hit failure (0 RIR), rest 15s, squeeze out 4 reps, rest 15s, finish with 3 reps.'
         },
-        cues: 'Polea a la altura de la muneca. Eleva en el plano escapular (30 grados por delante del cuerpo). Perfil de resistencia constante a lo largo de todo el recorrido.',
+        cues: 'Set pulley at wrist height. Raise in the scapular plane (30 degrees forward). Smooth constant resistance across the entire arc.',
         substitutions: [
-          'Dumbbell Lateral Raise con pausa',
+          'Dumbbell Lateral Raise with pause',
           'Machine Lateral Raise'
         ]
       },
@@ -126,15 +129,15 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Parciales en elongacion (serie 2)',
+          badge: 'Lengthened partials (Set 2)',
           badgeClass: 'badge-partials',
-          desc: 'En la Serie 2: al fallar el rango completo, realiza 4 a 6 pulsos en la mitad estirada detras de la cabeza.'
+          desc: 'On Set 2: when full range fails, complete 4 to 6 pulses in the deepest stretched half behind your head.'
         },
-        cues: 'Cables cruzados detras de la cabeza. Codos flexionados profundamente para estirar la cabeza larga del triceps al maximo. Extiende sin descolocar los codos.',
+        cues: 'Cables crossed behind your head. Deep elbow flexion to stretch the triceps long head. Extend cleanly without moving elbows.',
         substitutions: [
           'Single-Arm Overhead Cable Triceps Extension',
           'Incline Overhead DB Triceps Extension',
@@ -147,18 +150,18 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Parciales en elongacion (serie 2)',
+          badge: 'Lengthened partials (Set 2)',
           badgeClass: 'badge-partials',
-          desc: 'En la Serie 2: al fallar, saca 4 a 5 repeticiones parciales en el fondo estirado.'
+          desc: 'On Set 2: at failure, complete 4 to 5 partial reps from the bottom stretch.'
         },
-        cues: 'Banca a 45 grados. Deja que los brazos cuelguen perpendiculares al suelo. Manten hombros pegados a la banca para pre-estirar la cabeza larga del biceps.',
+        cues: 'Set bench to 45 degrees. Let arms hang vertical. Keep shoulders pinned against the bench to pre-stretch the biceps long head.',
         substitutions: [
           'Behind-the-Back Cable Curl (Bayesian Curl)',
-          'Preacher Curl en banco Scott',
+          'Preacher Curl',
           'Seated Dumbbell Curl'
         ]
       }
@@ -168,8 +171,8 @@ const ROUTINE_DATA = {
   lowerA: {
     id: 'lowerA',
     name: 'Lower A',
-    dayName: 'Martes',
-    title: 'Lower A: Quad Bias y Knee Flexion',
+    dayName: 'Tuesday',
+    title: 'Lower A: Quad Bias & Knee Flexion',
     focus: 'Hack Squat, Seated Leg Curl, Bulgarian Split Squats, Calves',
     exercises: [
       {
@@ -178,18 +181,18 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [6, 8],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 180,
         isAxialCompound: true,
         technique: {
           badge: 'Top set driver',
           badgeClass: 'badge-pause',
-          desc: 'Profundidad maxima sin redondear pelvis. Serie 1 dicta la progresion semanal.'
+          desc: 'Max depth without pelvic tuck. Set 1 dictates weekly progression.'
         },
-        cues: 'Pies en la parte baja o media de la plataforma para favorecer la flexion de rodilla sobre la punta del pie. Descenso en 3s controlados.',
+        cues: 'Place feet low to mid platform to maximize knee travel over toes. Lower under 3-second control.',
         substitutions: [
-          '45° Leg Press (pies bajos)',
-          'Smith Machine Squat (pies adelantados o talones elevados)',
+          '45° Leg Press (low feet)',
+          'Smith Machine Squat (forward feet or heels elevated)',
           'Barbell High Bar Squat'
         ]
       },
@@ -199,17 +202,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 120,
         isAxialCompound: false,
         technique: {
-          badge: 'Parciales en elongacion (serie 3)',
+          badge: 'Lengthened partials (Set 3)',
           badgeClass: 'badge-partials',
-          desc: 'En Serie 3: al fallar, realiza 4 a 5 pulsos en el estiramiento con rodillas casi extendidas.'
+          desc: 'On Set 3: at failure, complete 4 to 5 pulses in the deep stretch with knees nearly straight.'
         },
-        cues: 'Torso erguido o ligeramente inclinado hacia adelante para pre-estirar los isquiosurales en la cadera. Aprieta el soporte firmemente contra los muslos.',
+        cues: 'Keep torso upright or lean slightly forward to pre-stretch hamstrings at the hip. Lock thigh pad down tightly.',
         substitutions: [
-          'Lying Leg Curl con almohadilla bajo caderas',
+          'Lying Leg Curl (hips elevated on pad)',
           'Nordic Hamstring Curl'
         ]
       },
@@ -219,18 +222,18 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [8, 10],
         targetRir: 2,
-        targetRirLabel: '2 RIR por pierna',
+        targetRirLabel: '2 RIR per leg',
         restSeconds: 90,
         isAxialCompound: true,
         technique: {
-          badge: 'Estabilidad unilateral',
+          badge: 'Unilateral stability',
           badgeClass: 'badge-pause',
-          desc: '90s de descanso entre cada pierna para evitar deficit cardiovascular.'
+          desc: 'Rest 90 seconds between legs to keep cardio fatigue from capping quad output.'
         },
-        cues: 'Inclinacion de torso de 15 a 20 grados hacia adelante para equilibrar tension en gluteo y cuadriceps. Apoya el pie trasero en banco o rodillo.',
+        cues: 'Lean torso 15 to 20 degrees forward to distribute load across glutes and quads. Rest rear foot on bench or roller.',
         substitutions: [
           'Walking Dumbbell Lunges',
-          'Reverse Lunges con barra o mancuernas',
+          'Barbell or Dumbbell Reverse Lunges',
           'Single-Leg Press'
         ]
       },
@@ -240,17 +243,17 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [12, 15],
         targetRir: 0,
-        targetRirLabel: '0 RIR (Fallo)',
+        targetRirLabel: '0 RIR (Failure)',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Rest-pause en serie 2',
+          badge: 'Rest-pause on Set 2',
           badgeClass: 'badge-rest-pause',
-          desc: 'En Serie 2: llega a 0 RIR, suelta 15s, saca 4 reps, suelta 15s, saca 3 reps.'
+          desc: 'On Set 2: reach 0 RIR, rest 15s, squeeze out 4 reps, rest 15s, finish with 3 reps.'
         },
-        cues: 'Alinea el eje de giro de la maquina con la articulacion de la rodilla. Pausa de 1s en la contraccion pico sin hiperextender bruscamente.',
+        cues: 'Align machine pivot with knee joint. Pause 1s at peak contraction without hyperextending.',
         substitutions: [
-          'Sissy Squat asistida',
+          'Assisted Sissy Squat',
           'Reverse Nordic Curl'
         ]
       },
@@ -260,17 +263,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [8, 10],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Pausa de 2s en estiramiento',
+          badge: '2s stretch pause',
           badgeClass: 'badge-stretch',
-          desc: 'Pausa obligatoria de 2 segundos en el fondo del estiramiento para eliminar el rebote del tendon de Aquiles.'
+          desc: 'Mandatory 2-second pause at the bottom stretch to eliminate Achilles tendon recoil.'
         },
-        cues: 'Rodillas bloqueadas (gastrocnemio estirado). Baja profundo, congela 2s abajo, y sube con propulsion controlada sobre el metatarso.',
+        cues: 'Keep knees locked to stretch gastrocnemius. Deep drop, freeze 2s at bottom, drive up onto balls of feet under control.',
         substitutions: [
-          'Leg Press Calf Press con 2s pausa',
+          'Leg Press Calf Press (2s pause)',
           'Smith Machine Calf Raise'
         ]
       }
@@ -280,8 +283,8 @@ const ROUTINE_DATA = {
   upperB: {
     id: 'upperB',
     name: 'Upper B',
-    dayName: 'Jueves',
-    title: 'Upper B: Vertical Push y Horizontal Pull',
+    dayName: 'Thursday',
+    title: 'Upper B: Vertical Push & Horizontal Pull',
     focus: 'T-Bar Row, Seated DB Shoulder Press, Incline Cable Flyes, Arms',
     exercises: [
       {
@@ -290,15 +293,15 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [6, 8],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 150,
         isAxialCompound: false,
         technique: {
           badge: 'Top set driver',
           badgeClass: 'badge-pause',
-          desc: 'Top Set Progression Driver para densidad de espalda alta.'
+          desc: 'Top set progression driver for upper back density.'
         },
-        cues: 'Agarre semi-ancho. Deja que los hombros se protraigan completamente al frente en el estiramiento, y retrae escapulas al maximo en el tiron.',
+        cues: 'Semi-wide grip. Let shoulder blades protract forward in the stretch, then retract hard into the pull.',
         substitutions: [
           'Chest-Supported Dumbbell Row',
           'Seated Wide-Grip Cable Row',
@@ -311,19 +314,19 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [8, 10],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 120,
         isAxialCompound: false,
         technique: {
-          badge: 'Banca a 75 grados',
+          badge: '75° bench angle',
           badgeClass: 'badge-pause',
-          desc: 'La inclinacion a 75 grados protege el hombro y reduce el arco lumbar compensatorio.'
+          desc: 'A 75-degree incline protects the shoulder joint and prevents excessive lumbar arching.'
         },
-        cues: 'Baja las mancuernas hasta la altura de las orejas o menton para estirar el deltoides anterior. Codos ligeramente en plano escapular (30 grados hacia adelante).',
+        cues: 'Lower dumbbells to ear or chin height to stretch anterior delts. Elbows tucked 30 degrees into scapular plane.',
         substitutions: [
           'Overhead Smith Machine Press',
           'Seated Machine Shoulder Press',
-          'Standing Overhead Barbell Press (1 a 2 RIR)'
+          'Standing Overhead Barbell Press (1 to 2 RIR)'
         ]
       },
       {
@@ -332,19 +335,19 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Loaded stretch de 10s (serie 3)',
+          badge: '10s loaded stretch (Set 3)',
           badgeClass: 'badge-stretch',
-          desc: 'Al terminar la ultima repeticion de la Serie 3, sosten la apertura estirada bajo carga durante 10 segundos continuos.'
+          desc: 'After the final rep of Set 3, hold the deep stretch under load for 10 seconds.'
         },
-        cues: 'Poleas a media altura. Codos ligeramente flexionados de manera fija. Concentrate en sentir el estiramiento de las fibras pectorales superiores.',
+        cues: 'Set pulleys at mid height. Maintain a slight fixed elbow bend. Focus on feeling the upper pec stretch at the bottom.',
         substitutions: [
-          'Pec Deck Machine con 10s loaded stretch al final',
+          'Pec Deck Machine (10s loaded stretch finisher)',
           'Flat Cable Crossover',
-          'Dumbbell Incline Flyes'
+          'Incline Dumbbell Flyes'
         ]
       },
       {
@@ -353,15 +356,15 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [10, 12],
         targetRir: 1,
-        targetRirLabel: '1 RIR por lado',
+        targetRirLabel: '1 RIR per side',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Alineacion de fibras lumbares',
+          badge: 'Iliac fiber alignment',
           badgeClass: 'badge-pause',
-          desc: 'Alinea la linea de fuerza directamente con las fibras lumbares e iliacas del dorsal.'
+          desc: 'Line up the cable directly with the lat iliac fibers.'
         },
-        cues: 'Ligera inclinacion lateral hacia el lado activo. Tira conduciendo el codo pegado al costado hacia la cresta iliaca sin rotar el torso.',
+        cues: 'Slight side bend toward working side. Drive elbow tight against ribcage toward the iliac crest without rotating torso.',
         substitutions: [
           'Half-Kneeling Single-Arm Cable Pulldown',
           'Single-Arm Machine Lat Pulldown'
@@ -373,18 +376,18 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [12, 15],
         targetRir: 0,
-        targetRirLabel: '0 RIR (Fallo)',
+        targetRirLabel: '0 RIR (Failure)',
         restSeconds: 60,
         isAxialCompound: false,
         technique: {
-          badge: 'Rest-pause en serie 3',
+          badge: 'Rest-pause on Set 3',
           badgeClass: 'badge-rest-pause',
-          desc: 'En Serie 3: falla en 0 RIR, descansa 15s, saca 4 reps, descansa 15s, saca 3 reps.'
+          desc: 'On Set 3: hit failure (0 RIR), rest 15s, complete 4 reps, rest 15s, finish with 3 reps.'
         },
-        cues: 'Brazos a 30 o 45 grados por debajo de la altura del hombro para aislar el deltoides posterior y evitar trapecio superior. No retraigas escapulas bruscamente.',
+        cues: 'Handles 30 to 45 degrees below shoulder height to isolate rear delts and quiet the upper traps. Keep shoulder blades relatively stable.',
         substitutions: [
           'Incline DB Rear Delt Fly',
-          'Face Pulls con cuerda a 0 RIR'
+          'Rope Face Pulls (0 RIR)'
         ]
       },
       {
@@ -393,18 +396,18 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Cabezas lateral y medial',
+          badge: 'Lateral & medial heads',
           badgeClass: 'badge-pause',
-          desc: 'Sobrecarga las cabezas lateral y medial del triceps en la posicion acortada.'
+          desc: 'Overloads lateral and medial triceps heads in the shortened position.'
         },
-        cues: 'Codos pegados firmes a los costados. Bloquea la articulacion del codo en la parte baja con control.',
+        cues: 'Elbows pinned firmly at ribs. Lock elbows out under control at the bottom.',
         substitutions: [
           'Rope Triceps Pushdown',
-          'Dips en paralelas asistidas o peso corporal'
+          'Parallel Bar Dips (assisted or bodyweight)'
         ]
       },
       {
@@ -413,19 +416,19 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Braquial y antebrazo',
+          badge: 'Brachialis & forearm',
           badgeClass: 'badge-pause',
-          desc: 'Desarrolla el braquial y braquiorradial para engrosar el brazo.'
+          desc: 'Builds brachialis and brachioradialis for arm thickness.'
         },
-        cues: 'Agarre neutro estricto (pulgares hacia arriba). Sin balanceo de cadera ni impulso del torso.',
+        cues: 'Strict neutral grip (thumbs pointing up). Zero torso swing or hip drive.',
         substitutions: [
           'Rope Cable Hammer Curl',
           'Cross-Body DB Hammer Curl',
-          'Reverse Grip EZ-Bar Curl'
+          'Reverse-Grip EZ-Bar Curl'
         ]
       }
     ]
@@ -434,8 +437,8 @@ const ROUTINE_DATA = {
   lowerB: {
     id: 'lowerB',
     name: 'Lower B',
-    dayName: 'Viernes',
-    title: 'Lower B: Posterior Chain y Adductor Focus',
+    dayName: 'Friday',
+    title: 'Lower B: Posterior Chain & Adductor Focus',
     focus: 'Romanian Deadlift, High & Wide Leg Press, Adductors, Calves',
     exercises: [
       {
@@ -450,12 +453,12 @@ const ROUTINE_DATA = {
         technique: {
           badge: 'Top set driver',
           badgeClass: 'badge-pause',
-          desc: 'Bisagra de cadera pura. Respeta los 2 RIR para proteger erectores espinales y SNC.'
+          desc: 'Pure hip hinge. Keep 2 RIR to protect spinal erectors and central nervous system.'
         },
-        cues: 'Empuja la cadera horizontalmente hacia la pared trasera. Rodillas con flexion minima y fija. Desciende la carga pegada a las tibias hasta el limite del estiramiento.',
+        cues: 'Push hips back toward the wall behind you. Soft, fixed knee bend. Keep weight skimming your shins down to the hamstring stretch limit.',
         substitutions: [
           'Dumbbell RDL',
-          '45° Hyperextension con espalda neutra',
+          '45° Back Extension (neutral spine)',
           'Trap Bar RDL'
         ]
       },
@@ -465,18 +468,18 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [8, 10],
         targetRir: 1.5,
-        targetRirLabel: '1 a 2 RIR',
+        targetRirLabel: '1 to 2 RIR',
         restSeconds: 150,
         isAxialCompound: false,
         technique: {
-          badge: 'Enfoque en aductores y gluteos',
+          badge: 'Adductor & glute bias',
           badgeClass: 'badge-pause',
-          desc: 'Posicion de pies alta y abierta para maximizar brazo de momento de aductores y gluteos.'
+          desc: 'High and wide foot placement maximizes the moment arm for adductors and glutes.'
         },
-        cues: 'Pies en la parte superior de la plataforma, separados mas que la anchura de hombros y puntas hacia afuera (30 grados). Baja profundo sin despegar el coxis.',
+        cues: 'Feet high on the sled, wider than shoulder width with toes angled 30 degrees outward. Lower deep without tucking tailbone.',
         substitutions: [
           'Barbell Sumo Squat',
-          'Smith Machine Wide Stance Squat'
+          'Smith Machine Wide-Stance Squat'
         ]
       },
       {
@@ -485,15 +488,15 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [10, 12],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Rest-pause en serie 2',
+          badge: 'Rest-pause on Set 2',
           badgeClass: 'badge-rest-pause',
-          desc: 'En Serie 2: falla en 0 RIR, descansa 15s, saca 3 reps, descansa 15s, saca 2 reps.'
+          desc: 'On Set 2: reach 0 RIR, rest 15s, complete 3 reps, rest 15s, finish with 2 reps.'
         },
-        cues: 'Caderas pegadas a la almohadilla (aprieta gluteos para evitar arquear la zona lumbar). Flexiona y desciende en 2s controlados.',
+        cues: 'Hips pressed firmly into pad (squeeze glutes to avoid arching lower back). Curl up, then lower in 2 controlled seconds.',
         substitutions: [
           'Seated Leg Curl',
           'Single-Leg Standing Leg Curl'
@@ -505,17 +508,17 @@ const ROUTINE_DATA = {
         sets: 2,
         targetReps: [12, 15],
         targetRir: 0,
-        targetRirLabel: '0 RIR (Fallo)',
+        targetRirLabel: '0 RIR (Failure)',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Parciales en elongacion (serie 2)',
+          badge: 'Lengthened partials (Set 2)',
           badgeClass: 'badge-partials',
-          desc: 'En Serie 2: al fallar el rango completo, realiza 5 a 6 pulsos en la apertura maxima estirada.'
+          desc: 'On Set 2: upon full-range failure, pulse 5 to 6 reps in the widest stretched position.'
         },
-        cues: 'Abre la maquina a la maxima amplitud que permita tu movilidad. Cierra con fuerza controlada y aguanta el estiramiento 1s abajo.',
+        cues: 'Set machine to maximum comfortable hip abduction. Squeeze in with control and hold the outer stretch 1s.',
         substitutions: [
-          'Cable Hip Adduction con tobillera',
+          'Cable Hip Adduction with ankle strap',
           'Copenhagen Plank'
         ]
       },
@@ -525,17 +528,17 @@ const ROUTINE_DATA = {
         sets: 3,
         targetReps: [12, 15],
         targetRir: 0.5,
-        targetRirLabel: '0 a 1 RIR',
+        targetRirLabel: '0 to 1 RIR',
         restSeconds: 90,
         isAxialCompound: false,
         technique: {
-          badge: 'Pausa de 2s en estiramiento del soleo',
+          badge: '2s stretch pause (soleus)',
           badgeClass: 'badge-stretch',
-          desc: 'Con rodillas flexionadas a 90 grados, el soleo asume casi todo el trabajo hipertrofico.'
+          desc: 'With knees bent at 90 degrees, the soleus takes on nearly all the work.'
         },
-        cues: 'Descenso profundo en dorsiflexion. Pausa de 2 segundos completos en el fondo del estiramiento. Contraccion controlada arriba.',
+        cues: 'Deep dorsiflexion stretch. Pause 2 full seconds at the bottom. Squeeze up under control.',
         substitutions: [
-          'Standing Calf Raise con rodillas ligeramente flexionadas'
+          'Standing Calf Raise (slight knee bend)'
         ]
       }
     ]
@@ -606,7 +609,8 @@ function playBeep(freq = 587.33, duration = 0.15, type = 'sine') {
     osc.start();
     osc.stop(state.audioCtx.currentTime + duration);
   } catch (e) {
-    console.warn('Audio play failed', e);
+    console.warn('Audio playback error, falling back without sound:', e);
+    state.audioCtx = null;
   }
 }
 
@@ -618,7 +622,7 @@ function playCompletionChime() {
     try {
       navigator.vibrate([200, 100, 200, 100, 400]);
     } catch (err) {
-      console.debug('Haptics vibrate unavailable:', err);
+      console.warn('Haptic vibration failed, continuing without vibration:', err);
     }
   }
 }
@@ -747,7 +751,7 @@ function saveDraft() {
 // 3. REST TIMER IMPLEMENTATION
 // ============================================================================
 
-function startRestTimer(seconds, exerciseName = 'Descanso') {
+function startRestTimer(seconds, exerciseName = 'Rest') {
   clearInterval(state.timer.interval);
   clearTimeout(state.timer.hideTimeout);
   state.timer.totalSeconds = seconds;
@@ -822,12 +826,12 @@ function evaluateDdpSet(exercise, setIndex, weight, reps, rir) {
       const maxInc = (weight * 0.05).toFixed(1);
       return {
         type: 'ceiling',
-        message: `<strong>Techo alcanzado en Serie 1:</strong> completaste ${reps} reps (objetivo: ${maxReps}). Motor DDP: la proxima semana sube la carga entre 2.5% y 5% (+${minInc} a +${maxInc} ${unit}).`
+        message: `<strong>Ceiling hit on Set 1:</strong> Completed ${reps} reps (target: ${maxReps}). DDP: Increase load 2.5% to 5% next week (+${minInc} to +${maxInc} ${unit}).`
       };
     } else if (reps < minReps) {
       return {
         type: 'floor',
-        message: `Serie 1 por debajo del piso (${reps} de ${minReps} reps). Manten el peso la proxima semana hasta consolidar el rango.`
+        message: `Set 1 below floor (${reps} of ${minReps} reps). Keep current weight next week until you hit the rep target.`
       };
     }
     return null;
@@ -836,7 +840,7 @@ function evaluateDdpSet(exercise, setIndex, weight, reps, rir) {
       const dropAmount = (weight * 0.075).toFixed(1);
       return {
         type: 'floor',
-        message: `<strong>Caida por fatiga:</strong> hiciste ${reps} reps (menor a ${minReps}). DDP recomienda reducir la carga entre 5% y 10% (-${dropAmount} ${unit}) en la siguiente serie.`
+        message: `<strong>Fatigue drop-off:</strong> Completed ${reps} reps (below ${minReps}). DDP: Reduce load 5% to 10% (-${dropAmount} ${unit}) on next set.`
       };
     }
     return null;
@@ -863,7 +867,7 @@ function renderSession() {
 
   if (deloadStatus) {
     deloadStatus.textContent = state.isDeloadMode 
-      ? 'Modo deload activo (50% volumen, 3 a 4 RIR)' 
+      ? 'Deload active (50% volume, 3 to 4 RIR)' 
       : '4-day upper and lower split';
     deloadStatus.style.color = state.isDeloadMode ? 'var(--color-accent-2)' : 'var(--color-muted)';
   }
@@ -874,15 +878,15 @@ function renderSession() {
     if (state.isWorkoutActive) {
       if (!state.activeWorkoutSessionId || state.activeWorkoutSessionId === state.currentSessionId) {
         btnToggle.classList.add('active-workout');
-        lblAction.textContent = 'Finalizar sesion';
+        lblAction.textContent = 'Finish workout';
       } else {
         btnToggle.classList.remove('active-workout');
-        const activeName = ROUTINE_DATA[state.activeWorkoutSessionId]?.name || 'otra sesion';
-        lblAction.textContent = `Sesion activa en ${activeName}`;
+        const activeName = ROUTINE_DATA[state.activeWorkoutSessionId]?.name || 'other workout';
+        lblAction.textContent = `${activeName} in progress`;
       }
     } else {
       btnToggle.classList.remove('active-workout');
-      lblAction.textContent = 'Iniciar entrenamiento';
+      lblAction.textContent = 'Start workout';
     }
   }
 
@@ -890,7 +894,7 @@ function renderSession() {
   session.exercises.forEach(ex => {
     totalSets += state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
   });
-  if (totalSetsEl) totalSetsEl.textContent = `${totalSets} series`;
+  if (totalSetsEl) totalSetsEl.textContent = `${totalSets} sets`;
 
   const container = document.getElementById('exercisesList');
   if (!container) return;
@@ -911,7 +915,7 @@ function renderSession() {
       ? Math.max(1, Math.round(exercise.sets * 0.5)) 
       : exercise.sets;
 
-    const rirLabel = state.isDeloadMode ? '3 a 4 RIR' : exercise.targetRirLabel;
+    const rirLabel = state.isDeloadMode ? '3 to 4 RIR' : exercise.targetRirLabel;
 
     let rowsHtml = '';
     for (let i = 0; i < plannedSets; i++) {
@@ -959,24 +963,24 @@ function renderSession() {
       rowsHtml += `
         <div class="set-row ${isCompleted ? 'completed' : ''}" id="row_${exercise.id}_${i}">
           <div class="set-col-num">${setNum}</div>
-          <div class="set-col-prev" title="Anterior">${prevText}</div>
+          <div class="set-col-prev" title="Previous">${prevText}</div>
           <div>
             <input type="number" step="0.5" inputmode="decimal" class="set-input set-input-weight" 
                    data-ex="${exercise.id}" data-set="${i}" placeholder="${state.weightUnit}" 
-                   value="${valWeight}" aria-label="Peso para serie ${setNum}">
+                   value="${valWeight}" aria-label="Weight for set ${setNum}">
           </div>
           <div>
             <input type="number" inputmode="numeric" class="set-input set-input-reps" 
                    data-ex="${exercise.id}" data-set="${i}" placeholder="reps" 
-                   value="${valReps}" aria-label="Repeticiones para serie ${setNum}">
+                   value="${valReps}" aria-label="Reps for set ${setNum}">
           </div>
           <div>
             <input type="number" step="0.5" inputmode="decimal" class="set-input set-input-rir" 
                    data-ex="${exercise.id}" data-set="${i}" placeholder="RIR" 
-                   value="${valRir}" aria-label="RIR para serie ${setNum}">
+                   value="${valRir}" aria-label="RIR for set ${setNum}">
           </div>
           <div>
-            <button class="set-check-btn" data-ex="${exercise.id}" data-set="${i}" aria-label="Marcar serie ${setNum} como completada" aria-pressed="${isCompleted ? 'true' : 'false'}">
+            <button class="set-check-btn" data-ex="${exercise.id}" data-set="${i}" aria-label="Mark set ${setNum} as completed" aria-pressed="${isCompleted ? 'true' : 'false'}">
               ${isCompleted ? '✓' : ''}
             </button>
           </div>
@@ -990,19 +994,19 @@ function renderSession() {
         <div class="exercise-top-row">
           <div class="exercise-title">${exerciseDisplayName}</div>
           ${isSubstituted ? `
-            <button type="button" class="btn-restore-sub" data-restore-sub="${exercise.id}" title="Restaurar ejercicio original" aria-label="Restaurar ejercicio original">
-              ↺ Restaurar
+            <button type="button" class="btn-restore-sub" data-restore-sub="${exercise.id}" title="Restore original exercise" aria-label="Restore original exercise">
+              ↺ Restore
             </button>
           ` : ''}
         </div>
         <div class="exercise-target-line">
-          <span class="target-bracket">${plannedSets} series x ${exercise.targetReps[0]} a ${exercise.targetReps[1]} reps</span>
+          <span class="target-bracket">${plannedSets} sets x ${exercise.targetReps[0]} to ${exercise.targetReps[1]} reps</span>
           <span class="target-rir">${rirLabel}</span>
-          <span class="target-rest">Descanso: ${Math.round(exercise.restSeconds / 60 * 10) / 10} min</span>
+          <span class="target-rest">Rest: ${Math.round(exercise.restSeconds / 60 * 10) / 10} min</span>
         </div>
         ${isSubstituted ? `
           <div class="technique-badge badge-sub">
-            Sustituto de: ${exercise.name}
+            Substitute for: ${exercise.name}
           </div>
         ` : ''}
         ${exercise.technique ? `
@@ -1011,25 +1015,25 @@ function renderSession() {
           </div>
         ` : ''}
         <button class="btn-accordion" data-accordion="${exercise.id}" aria-expanded="false" aria-controls="drawer_${exercise.id}">
-          <span>Tecnica y sustituciones</span>
+          <span>Technique & substitutions</span>
           <span class="accordion-chevron" aria-hidden="true"></span>
         </button>
       </div>
 
       <div class="accordion-drawer hidden" id="drawer_${exercise.id}">
-        <p><strong>Cues de ejecucion:</strong> ${exercise.cues}</p>
-        ${exercise.technique ? `<p style="margin-top:var(--space-2xs);"><strong>Detalle tecnico:</strong> ${exercise.technique.desc}</p>` : ''}
-        <button type="button" class="drawer-sub-btn" data-show-subs="${exercise.id}">Ver sustituciones de maquinas y pesas</button>
+        <p><strong>Execution cues:</strong> ${exercise.cues}</p>
+        ${exercise.technique ? `<p style="margin-top:var(--space-2xs);"><strong>Technical detail:</strong> ${exercise.technique.desc}</p>` : ''}
+        <button type="button" class="drawer-sub-btn" data-show-subs="${exercise.id}">View equipment & machine substitutions</button>
       </div>
 
       <div class="sets-table">
         <div class="table-header">
-          <div>Serie</div>
-          <div>Previa</div>
+          <div>Set</div>
+          <div>Prev</div>
           <div>${state.weightUnit}</div>
           <div>Reps</div>
           <div>RIR</div>
-          <div>Fin</div>
+          <div>Done</div>
         </div>
         ${rowsHtml}
       </div>
@@ -1161,7 +1165,7 @@ function attachExerciseCardListeners() {
         if (exercise && exercise.restSeconds) {
           const subData = state.substitutions && state.substitutions[exId];
           const timerName = (subData && subData.name) || exercise.name;
-          startRestTimer(exercise.restSeconds, `${timerName} (Serie ${setIdx + 1})`);
+          startRestTimer(exercise.restSeconds, `${timerName} (Set ${setIdx + 1})`);
         }
       } else {
         row.classList.remove('completed');
@@ -1217,8 +1221,8 @@ function openSubstitutionsModal(exerciseId) {
 
   if (title) {
     title.textContent = isCurrentlySubbed
-      ? `Sustitución activa: ${subData.name}`
-      : `Sustitutos: ${ex.name}`;
+      ? `Active substitute: ${subData.name}`
+      : `Substitutes: ${ex.name}`;
   }
 
   if (body) {
@@ -1228,12 +1232,12 @@ function openSubstitutionsModal(exerciseId) {
       html += `
         <div class="sub-active-banner">
           <div class="sub-active-info">
-            <span class="sub-active-label">Sustituyendo actualmente a:</span>
+            <span class="sub-active-label">Currently substituting:</span>
             <strong class="sub-active-orig">${ex.name}</strong>
-            <span class="sub-active-name">Actual: ${subData.name}</span>
+            <span class="sub-active-name">Current: ${subData.name}</span>
           </div>
-          <button type="button" class="btn-restore-prominent" id="btnRestoreProminent" aria-label="Restaurar ejercicio original">
-            ↺ Restaurar ejercicio original
+          <button type="button" class="btn-restore-prominent" id="btnRestoreProminent" aria-label="Restore original exercise">
+            ↺ Restore original exercise
           </button>
         </div>
       `;
@@ -1242,7 +1246,7 @@ function openSubstitutionsModal(exerciseId) {
     html += `
       <div class="sub-section-header">
         <p class="sub-section-desc">
-          Alternativas con idéntico perfil de resistencia y estiramiento:
+          Alternatives with matching resistance curves:
         </p>
       </div>
       <ul class="sub-options-list">
@@ -1250,7 +1254,7 @@ function openSubstitutionsModal(exerciseId) {
 
     const alternatives = Array.isArray(ex.substitutions) ? ex.substitutions : [];
     if (alternatives.length === 0) {
-      html += `<li class="sub-empty">No hay sustitutos predefinidos para este ejercicio.</li>`;
+      html += `<li class="sub-empty">No predefined substitutes for this exercise.</li>`;
     } else {
       alternatives.forEach((sub, idx) => {
         const isThisActive = isCurrentlySubbed && subData.name === sub;
@@ -1258,10 +1262,10 @@ function openSubstitutionsModal(exerciseId) {
           <li class="sub-option-item ${isThisActive ? 'is-active' : ''}" data-sub-idx="${idx}">
             <div class="sub-option-text">
               <strong class="sub-option-name">${sub}</strong>
-              ${isThisActive ? '<span class="sub-active-chip">En uso</span>' : ''}
+              ${isThisActive ? '<span class="sub-active-chip">In use</span>' : ''}
             </div>
-            <button type="button" class="btn-sub-select" data-sub-idx="${idx}" aria-label="Usar sustituto ${sub}">
-              Usar este sustituto
+            <button type="button" class="btn-sub-select" data-sub-idx="${idx}" aria-label="Use substitute ${sub}">
+              Use this substitute
             </button>
           </li>
         `;
@@ -1271,10 +1275,10 @@ function openSubstitutionsModal(exerciseId) {
     html += `
       </ul>
       <div class="sub-custom-card">
-        <label for="inputCustomSub" class="sub-custom-label">O escribe el nombre de otra máquina/ejercicio:</label>
+        <label for="inputCustomSub" class="sub-custom-label">Or enter a custom machine/exercise:</label>
         <div class="sub-custom-input-group">
-          <input type="text" id="inputCustomSub" class="sub-custom-input" placeholder="O escribe el nombre de otra máquina/ejercicio" aria-label="Nombre de sustituto personalizado" autocomplete="off">
-          <button type="button" id="btnApplyCustomSub" class="btn-apply-sub">Aplicar</button>
+          <input type="text" id="inputCustomSub" class="sub-custom-input" placeholder="Or enter a custom machine/exercise" aria-label="Custom substitute name" autocomplete="off">
+          <button type="button" id="btnApplyCustomSub" class="btn-apply-sub">Apply</button>
         </div>
       </div>
     `;
@@ -1370,7 +1374,7 @@ function setupGlobalListeners() {
           if (activeBtn) activeBtn.click();
           return;
         }
-        const confirmed = confirm('Deseas finalizar y guardar esta sesion en tu historial?');
+        const confirmed = confirm('Do you want to finish and save this workout to your history?');
         if (confirmed) {
           finishWorkoutSession();
         }
@@ -1457,8 +1461,8 @@ function setupGlobalListeners() {
       applyTheme();
       const saved = saveSettings();
       document.getElementById('themeStatus').textContent = saved
-        ? 'Claro, oscuro o según tu dispositivo'
-        : 'No se pudo guardar. Se aplicará solo en esta sesión.';
+        ? 'Light, dark, or system preference'
+        : 'Could not save theme override. Applied for this session only.';
     };
   }
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
@@ -1529,7 +1533,7 @@ function setupGlobalListeners() {
   const btnResetHistory = document.getElementById('btnResetHistory');
   if (btnResetHistory) {
     btnResetHistory.onclick = () => {
-      if (confirm('Estas seguro de que deseas borrar el historial de entrenamientos guardados?')) {
+      if (confirm('Are you sure you want to clear your saved workout history?')) {
         state.logs = {};
         state.history = [];
         state.draft = {};
@@ -1539,7 +1543,7 @@ function setupGlobalListeners() {
         saveDraft();
         renderSession();
         renderHistoryModal();
-        alert('Historial borrado.');
+        alert('Saved history cleared.');
       }
     };
   }
@@ -1557,8 +1561,8 @@ function finishWorkoutSession() {
     sessionTitle: session.title,
     dayName: session.dayName,
     timestamp: now,
-    dateString: new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }),
-    displayDate: new Date().toLocaleDateString('es-ES', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    dateString: new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }),
+    displayDate: new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     weightUnit: state.weightUnit,
     isDeloadMode: state.isDeloadMode,
     durationMinutes: state.workoutStartTime ? Math.max(1, Math.round((now - state.workoutStartTime) / 60000)) : 0,
@@ -1614,7 +1618,7 @@ function finishWorkoutSession() {
   renderHistoryModal();
   playCompletionChime();
 
-  alert(`Entrenamiento ${session.name} finalizado y registrado.`);
+  alert(`${session.name} workout finished and recorded.`);
 }
 
 function setupHistoryTabs() {
@@ -1666,8 +1670,8 @@ function renderHistorySessions() {
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         </div>
-        <p class="history-empty-title">Sin entrenamientos registrados</p>
-        <p class="history-empty-desc">Completa una sesion para guardarla en tu historial y ver tu progreso.</p>
+        <p class="history-empty-title">No logged workouts</p>
+        <p class="history-empty-desc">Complete a workout to save it in your history and track your progress.</p>
       </div>
     `;
     return;
@@ -1710,7 +1714,7 @@ function renderHistorySessions() {
             <span class="history-card-date">${h.displayDate || h.dateString || new Date(h.timestamp).toLocaleDateString()}</span>
           </div>
           <div class="history-header-meta">
-            <span class="history-meta-pill">${h.durationMinutes ? `${h.durationMinutes} min` : `${totalCompletedSets} series`}</span>
+            <span class="history-meta-pill">${h.durationMinutes ? `${h.durationMinutes} min` : `${totalCompletedSets} sets`}</span>
           </div>
         </div>
         ${topSetSummary ? `<div class="history-card-date"><strong>Top set:</strong> ${topSetSummary}</div>` : ''}
@@ -1719,9 +1723,9 @@ function renderHistorySessions() {
           <table class="history-table">
             <thead>
               <tr>
-                <th>Ejercicio</th>
-                <th>Serie</th>
-                <th>Carga (${h.weightUnit || 'kg'})</th>
+                <th>Exercise</th>
+                <th>Set</th>
+                <th>Load (${h.weightUnit || 'kg'})</th>
                 <th>Reps</th>
                 <th>RIR</th>
               </tr>
@@ -1754,13 +1758,13 @@ function renderHistorySessions() {
 
         <div class="history-card-actions">
           <button class="btn-history-action btn-toggle-detail" data-toggle-history="${h.id}">
-            Ver detalle
+            View details
           </button>
-          <button class="btn-history-action btn-copy-md" data-copy-history="${h.id}" title="Copiar resumen en Markdown">
-            Copiar Markdown
+          <button class="btn-history-action btn-copy-md" data-copy-history="${h.id}" title="Copy Markdown summary">
+            Copy Markdown
           </button>
-          <button class="btn-history-action btn-history-delete" data-delete-history="${h.id}" title="Eliminar este entrenamiento">
-            Eliminar
+          <button class="btn-history-action btn-history-delete" data-delete-history="${h.id}" title="Delete this workout">
+            Delete
           </button>
         </div>
       </div>
@@ -1776,7 +1780,7 @@ function renderHistorySessions() {
       const details = document.getElementById(`historyDetails_${id}`);
       if (details) {
         const isHidden = details.classList.toggle('hidden');
-        btn.textContent = isHidden ? 'Ver detalle' : 'Ocultar detalle';
+        btn.textContent = isHidden ? 'View details' : 'Hide details';
       }
     };
   });
@@ -1896,7 +1900,7 @@ function generateProgressionSvg(points, metricKey, unit) {
   ].join(' ');
 
   let svg = `
-    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Grafico de progresion">
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Progression chart">
       <defs>
         <linearGradient id="progressionGradient" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32" />
@@ -1931,7 +1935,7 @@ function generateProgressionSvg(points, metricKey, unit) {
     svg += `
       <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${isSelected ? 7 : 5}" fill="var(--color-paper-2)" stroke="${isSelected ? 'var(--color-light)' : 'var(--color-accent)'}" stroke-width="${isSelected ? 3.5 : 2.5}" />
       <text x="${c.x.toFixed(1)}" y="${(padding.top + plotH + 20).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--color-muted)" font-family="var(--font-body)">${c.point.date.slice(0, 5)}</text>
-      <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="24" fill="transparent" class="chart-hit-circle" data-chart-index="${c.index}" aria-label="Punto ${c.point.date}: ${c.point[metricKey]} ${unit}" />
+      <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="24" fill="transparent" class="chart-hit-circle" data-chart-index="${c.index}" aria-label="Point ${c.point.date}: ${c.point[metricKey]} ${unit}" />
     `;
   });
 
@@ -1971,13 +1975,13 @@ function renderProgressionView() {
   let html = `
     <div class="chart-controls">
       <div class="chart-select-group">
-        <label for="historyExerciseSelect" class="chart-label">Ejercicio a analizar</label>
+        <label for="historyExerciseSelect" class="chart-label">Exercise to analyze</label>
         <select id="historyExerciseSelect" class="chart-select">
   `;
 
   exercises.forEach(ex => {
     const pointsCount = getExerciseHistoryData(ex.id).length;
-    const badge = pointsCount > 0 ? ` (${pointsCount} sesiones)` : '';
+    const badge = pointsCount > 0 ? ` (${pointsCount} workouts)` : '';
     const selected = ex.id === state.progression.exerciseId ? 'selected' : '';
     html += `<option value="${ex.id}" ${selected}>${ex.name}${badge}</option>`;
   });
@@ -1987,16 +1991,16 @@ function renderProgressionView() {
       </div>
 
       <div class="chart-select-group">
-        <span class="chart-label">Métrica de progresión</span>
-        <div class="chart-metric-pills" role="group" aria-label="Métrica de progresión">
+        <span class="chart-label">Progression metric</span>
+        <div class="chart-metric-pills" role="group" aria-label="Progression metric">
           <button class="metric-pill-btn ${state.progression.metric === 'set1_weight' ? 'active' : ''}" data-metric="set1_weight">
-            Peso Top Set
+            Top Set Load
           </button>
           <button class="metric-pill-btn ${state.progression.metric === 'e1rm' ? 'active' : ''}" data-metric="e1rm">
-            1RM Estimado
+            Est. 1RM
           </button>
           <button class="metric-pill-btn ${state.progression.metric === 'total_volume' ? 'active' : ''}" data-metric="total_volume">
-            Volumen Total
+            Total Volume
           </button>
         </div>
       </div>
@@ -2011,8 +2015,8 @@ function renderProgressionView() {
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
           </svg>
         </div>
-        <p class="history-empty-title">Sin datos para este ejercicio</p>
-        <p class="history-empty-desc">Completa un entrenamiento que incluya <strong>${selectedEx ? selectedEx.name : 'este ejercicio'}</strong> para visualizar su curva de progresión.</p>
+        <p class="history-empty-title">No data for this exercise</p>
+        <p class="history-empty-desc">Complete a workout that includes <strong>${selectedEx ? selectedEx.name : 'this exercise'}</strong> to view its progression curve.</p>
       </div>
     `;
     container.innerHTML = html;
@@ -2037,15 +2041,15 @@ function renderProgressionView() {
 
     <div class="chart-stats-grid">
       <div class="chart-stat-card">
-        <span class="chart-stat-label">Carga Inicial</span>
+        <span class="chart-stat-label">Initial Load</span>
         <span class="chart-stat-value">${firstVal} ${unit}</span>
       </div>
       <div class="chart-stat-card">
-        <span class="chart-stat-label">Máximo Logrado</span>
+        <span class="chart-stat-label">Peak Value</span>
         <span class="chart-stat-value accent">${maxVal} ${unit}</span>
       </div>
       <div class="chart-stat-card">
-        <span class="chart-stat-label">Progreso Neto</span>
+        <span class="chart-stat-label">Net Gain</span>
         <span class="chart-stat-value ${diffVal >= 0 ? 'positive' : ''}">${diffSign}${diffVal} ${unit} (${diffSign}${pctDiff}%)</span>
       </div>
     </div>
@@ -2064,11 +2068,11 @@ function renderProgressionView() {
           ${selPoint.isDeload ? '<span class="history-badge deload">Deload</span>' : ''}
         </div>
         <div>
-          <strong>Top Set (Serie 1):</strong> ${selPoint.set1_weight} ${selPoint.unit} × ${selPoint.set1_reps} reps
+          <strong>Top Set (Set 1):</strong> ${selPoint.set1_weight} ${selPoint.unit} × ${selPoint.set1_reps} reps
           ${selPoint.set1_rir !== null ? `(${selPoint.set1_rir} RIR)` : ''}
         </div>
         <div>
-          <strong>1RM Estimado:</strong> ${selPoint.e1rm} ${selPoint.unit} | <strong>Volumen Total:</strong> ${selPoint.total_volume} ${selPoint.unit}
+          <strong>Est. 1RM:</strong> ${selPoint.e1rm} ${selPoint.unit} | <strong>Total Volume:</strong> ${selPoint.total_volume} ${selPoint.unit}
         </div>
       </div>
     `;
@@ -2114,9 +2118,9 @@ function exportSingleHistoryMarkdown(id) {
   if (!item) return;
 
   const session = ROUTINE_DATA[item.sessionId];
-  let md = `### Sesion: ${item.sessionTitle || session?.title || item.sessionId}\n`;
-  md += `**Fecha:** ${item.displayDate || item.dateString} | **Unidad:** ${item.weightUnit || 'kg'}${item.isDeloadMode ? ' | **Modo Deload**' : ''}\n\n`;
-  md += `| Ejercicio | Serie | Carga (${item.weightUnit || 'kg'}) | Reps | RIR |\n`;
+  let md = `### Workout: ${item.sessionTitle || session?.title || item.sessionId}\n`;
+  md += `**Date:** ${item.displayDate || item.dateString} | **Unit:** ${item.weightUnit || 'kg'}${item.isDeloadMode ? ' | **Deload Mode**' : ''}\n\n`;
+  md += `| Exercise | Set | Load (${item.weightUnit || 'kg'}) | Reps | RIR |\n`;
   md += `| :--- | :---: | :---: | :---: | :---: |\n`;
 
   if (session) {
@@ -2131,17 +2135,17 @@ function exportSingleHistoryMarkdown(id) {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(md).then(() => {
-      alert('Resumen del entrenamiento copiado al portapapeles.');
+      alert('Workout summary copied to clipboard.');
     }).catch(() => {
-      prompt('Copia tu resumen markdown:', md);
+      prompt('Copy Markdown summary:', md);
     });
   } else {
-    prompt('Copia tu resumen markdown:', md);
+    prompt('Copy Markdown summary:', md);
   }
 }
 
 function deleteHistoryEntry(id) {
-  if (confirm('Estas seguro de eliminar este entrenamiento del historial?')) {
+  if (confirm('Are you sure you want to delete this workout from your history?')) {
     state.history = state.history.filter(h => h.id !== id);
     saveHistory();
     renderHistoryModal();
@@ -2150,9 +2154,9 @@ function deleteHistoryEntry(id) {
 
 function exportWorkoutMarkdown() {
   const session = ROUTINE_DATA[state.currentSessionId];
-  let md = `### Sesion: ${session.title}\n`;
-  md += `**Fecha:** ${new Date().toLocaleDateString()} | **Unidad:** ${state.weightUnit}\n\n`;
-  md += `| Ejercicio | Serie | Carga (${state.weightUnit}) | Reps | RIR | Nota |\n`;
+  let md = `### Workout: ${session.title}\n`;
+  md += `**Date:** ${new Date().toLocaleDateString('en-US')} | **Unit:** ${state.weightUnit}\n\n`;
+  md += `| Exercise | Set | Load (${state.weightUnit}) | Reps | RIR | Note |\n`;
   md += `| :--- | :---: | :---: | :---: | :---: | :--- |\n`;
 
   const loggedSession = state.logs[session.id];
@@ -2183,12 +2187,12 @@ function exportWorkoutMarkdown() {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(md).then(() => {
-      alert('Resumen de la sesion copiado al portapapeles en formato Markdown.');
+      alert('Session summary copied to clipboard in Markdown format.');
     }).catch(() => {
-      prompt('Copia tu resumen markdown:', md);
+      prompt('Copy Markdown summary:', md);
     });
   } else {
-    prompt('Copia tu resumen markdown:', md);
+    prompt('Copy Markdown summary:', md);
   }
 }
 
@@ -2241,9 +2245,9 @@ function importJsonBackup(event) {
       }
       renderSession();
       renderHistoryModal();
-      alert('Respaldo restaurado correctamente.');
+      alert('Backup restored successfully.');
     } catch (err) {
-      alert('Error al procesar el archivo JSON de respaldo.');
+      alert('Error parsing JSON backup file.');
       console.error(err);
     }
   };
@@ -2259,10 +2263,10 @@ function registerServiceWorker() {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then((reg) => {
-          console.log('Hypertrophy PWA Service Worker registrado con exito:', reg.scope);
+          console.log('Hypertrophy PWA Service Worker registered successfully:', reg.scope);
         })
         .catch((err) => {
-          console.warn('Error al registrar Service Worker:', err);
+          console.warn('Service Worker registration failed, running with standard network fallback:', err);
         });
     });
   }
@@ -2272,6 +2276,9 @@ function registerServiceWorker() {
 // 9. INITIALIZATION
 // ============================================================================
 
+window.ROUTINE_DATA = ROUTINE_DATA;
+window.state = state;
+
 window.addEventListener('DOMContentLoaded', () => {
   loadState();
   applyTheme();
@@ -2279,3 +2286,5 @@ window.addEventListener('DOMContentLoaded', () => {
   renderSession();
   registerServiceWorker();
 });
+
+})();

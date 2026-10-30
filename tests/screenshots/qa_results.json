@@ -1,311 +1,1259 @@
 {
-  "results": [
+  "regressions": {
+    "hidden_class": {
+      "hiddenByClass": true,
+      "hiddenByAttr": true,
+      "openOverlays": []
+    }
+  },
+  "viewports": {
+    "desktop_1280x800": {
+      "has_overflow": false,
+      "scrollWidth": 1280,
+      "clientWidth": 1280,
+      "bodyWidth": 1080,
+      "bodyCentered": true
+    },
+    "android_360x800": {
+      "has_overflow": false,
+      "scrollWidth": 360,
+      "clientWidth": 360
+    },
+    "narrow_320x640": {
+      "has_overflow": false,
+      "scrollWidth": 320,
+      "clientWidth": 320
+    }
+  },
+  "touch_targets": [
     {
-      "test": "Baseline Defect Check: Missing .hidden CSS class",
-      "passed": true,
-      "details": "Computed displays: modalSubstitutions='none', modalGuide='none', modalSettings='none', timerBar='none', ddpBanner='none'",
-      "defect": null
+      "selector": "button#btnHistory.icon-btn",
+      "label": "Workout history",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Initial Load & Upper A Setup",
-      "passed": true,
-      "details": "Title: 'Upper A: Horizontal Push y Vertical Pull', Sets: '19 series', Unit: 'kg', Exercises: 7",
-      "defect": null
+      "selector": "button#btnSettings.icon-btn",
+      "label": "Settings and tools",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Tab Navigation: Lower A",
-      "passed": true,
-      "details": "Title: 'Lower A: Quad Bias y Knee Flexion', Sets: '13 series', Cards: 5",
-      "defect": null
+      "selector": "button.tab-btn.active",
+      "label": "Mon\nUpper A",
+      "width": 86.5,
+      "height": 58.3,
+      "meets44": true
     },
     {
-      "test": "Tab Navigation: Upper B",
-      "passed": true,
-      "details": "Title: 'Upper B: Vertical Push y Horizontal Pull', Sets: '19 series', Cards: 7",
-      "defect": null
+      "selector": "button.tab-btn",
+      "label": "Tue\nLower A",
+      "width": 86.5,
+      "height": 58.3,
+      "meets44": true
     },
     {
-      "test": "Tab Navigation: Lower B",
-      "passed": true,
-      "details": "Title: 'Lower B: Posterior Chain y Adductor Focus', Sets: '13 series', Cards: 5",
-      "defect": null
+      "selector": "button.tab-btn",
+      "label": "Thu\nUpper B",
+      "width": 86.5,
+      "height": 58.3,
+      "meets44": true
     },
     {
-      "test": "Tab Navigation: Return to Upper A",
-      "passed": true,
-      "details": "Title: 'Upper A: Horizontal Push y Vertical Pull'",
-      "defect": null
+      "selector": "button.tab-btn",
+      "label": "Fri\nLower B",
+      "width": 86.5,
+      "height": 58.3,
+      "meets44": true
     },
     {
-      "test": "Start Workout Toggle",
-      "passed": true,
-      "details": "Label: 'Iniciar entrenamiento' -> 'Finalizar sesion', Class: 'btn-primary active-workout'",
-      "defect": null
+      "selector": "button#btnToggleWorkout.btn-primary",
+      "label": "Start workout",
+      "width": 197.5,
+      "height": 47.7,
+      "meets44": true
     },
     {
-      "test": "Set 1 DDP Ceiling Trigger (8 reps -> +2.5% to 5% alert)",
-      "passed": true,
-      "details": "Banner text: 'Techo alcanzado en Serie 1: completaste 8 reps (objetivo: 8). Motor DDP: la proxima semana sube la carga entre 2.5% y 5% (+0.8 a +1.5 kg).', Inline text: 'Techo alcanzado en Serie 1: completaste 8 reps (objetivo: 8). Motor DDP: la proxima semana sube la carga entre 2.5% y 5% (+0.8 a +1.5 kg).'",
-      "defect": null
+      "selector": "button#btnQuickNotes.btn-secondary",
+      "label": "DDP Guide",
+      "width": 118.5,
+      "height": 47.7,
+      "meets44": true
     },
     {
-      "test": "Rest Timer Auto-Start on Set Check",
-      "passed": true,
-      "details": "Visible: True, Label: 'Flat Dumbbell Press (Serie 1)', Clock: '03:00'",
-      "defect": null
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Timer +30s Button",
-      "passed": true,
-      "details": "Clock changed from 03:00 to 03:30",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Timer -30s Button",
-      "passed": true,
-      "details": "Clock changed from 03:30 to 02:59",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Timer Pause Toggle",
-      "passed": true,
-      "details": "Toggle Icon has polygon: True",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Timer Skip Button",
-      "passed": true,
-      "details": "Timer hidden after skip: True",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Set Drop-off Alert (<6 reps triggers fatigue alert & -5% to 10% load reduction)",
-      "passed": true,
-      "details": "Classes: 'set-ddp-insight insight-floor', Text: 'Caida por fatiga: hiciste 5 reps (menor a 6). DDP recomienda reducir la carga entre 5% y 10% (-2.3 kg) en la siguiente serie.'",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Set 3 Logging Completion",
-      "passed": true,
-      "details": "Flat DB Press all 3 sets completed",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Accordion Drawer Expansion",
-      "passed": true,
-      "details": "Drawer hidden: False",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Substitutions Modal Open & Content",
-      "passed": true,
-      "details": "Substitutions found: 'Barbell Flat Bench Press' in modal",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Exercise Substitution: Predefined Swap to Barbell Flat Bench Press",
-      "passed": true,
-      "details": "Card title: 'Barbell Flat Bench Press', Badge: 'Sustituto de: Flat Dumbbell Press'",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Exercise Substitution: Restore Original Exercise Reverts Title",
-      "passed": true,
-      "details": "Reverted title: 'Flat Dumbbell Press', Badge count: 0",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Exercise Substitution: Custom Substitute Input Applied",
-      "passed": true,
-      "details": "Custom title: 'Incline Hammer Strength Press', Badge: 'Sustituto de: Flat Dumbbell Press'",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 3",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Exercise Substitution: Clean Revert to Baseline",
-      "passed": true,
-      "details": "Final title: 'Flat Dumbbell Press'",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 3 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "DDP Guide Modal",
-      "passed": true,
-      "details": "Guide displayed Dynamic Double Progression principles",
-      "defect": null
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Settings Modal Open",
-      "passed": true,
-      "details": "Settings modal opened",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Unit Toggle to lbs",
-      "passed": true,
-      "details": "Unit Pill: 'lbs', Table Header: 'lbs'",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Deload Mode Activation (50% volume, 3 to 4 RIR)",
-      "passed": true,
-      "details": "Deload Status: 'Modo deload activo (50% volumen, 3 a 4 RIR)', Total sets: '12 series', First exercise: '2 series x 6 a 8 reps', RIR: '3 a 4 RIR'",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Settings Restore to Normal Mode (kg)",
-      "passed": true,
-      "details": "Deload unchecked and unit restored to kg",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout Session Finish",
-      "passed": true,
-      "details": "Button label: 'Iniciar entrenamiento', active: False",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Historical Retention (Previa Column)",
-      "passed": true,
-      "details": "Previa Set 1: '30x8', Set 2: '30x5', Set 3: '27.5x7'",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Overload Integrity: Substitute Hides Mismatched Machine Previa",
-      "passed": true,
-      "details": "Substituted Previa shows: '\u2014' (expected '\u2014', not '30x8')",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Overload Integrity: Restoring Original Exercise Restores Previa",
-      "passed": true,
-      "details": "Restored Previa shows: '30x8'",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "DDP Banner Hidden on Session Finish",
-      "passed": true,
-      "details": "Banner hidden after finish: True",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "DDP Banner Close Button",
-      "passed": true,
-      "details": "Banner hidden after close button: True",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Defect Investigation: Global DDP Banner on Set Uncheck",
-      "passed": true,
-      "details": "Banner class after unchecking set: 'ddp-alert hidden'",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 3",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Defect Investigation: Active Workout Cross-Tab State",
-      "passed": true,
-      "details": "While Upper A workout was active, switching to Lower A tab displays button label: 'Sesion activa en Upper A'.",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 3 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Modal Opens on Button Click",
-      "passed": true,
-      "details": "Modal classes: modal-overlay",
-      "defect": null
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Session Recorded in History List",
-      "passed": true,
-      "details": "Found 1 history cards in modal.",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Details Toggle Works",
-      "passed": true,
-      "details": "Expanded history card details table.",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Persists Across Page Reload",
-      "passed": true,
-      "details": "Found 1 history cards after reload.",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Progression Chart: Tab Switching",
-      "passed": true,
-      "details": "Charts visible: True, Sessions hidden: True",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Progression Chart: SVG Chart Rendered with Nodes",
-      "passed": true,
-      "details": "SVG: 1, Points: 1, Polyline: 1, Exercises in select: 24",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Progression Chart: Metric Toggle Recalculates Data",
-      "passed": true,
-      "details": "Active metric: 'e1rm', Detail card visible: True",
-      "defect": null
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Deletion from History List",
-      "passed": true,
-      "details": "Cards remaining: 0, Empty state visible: True",
-      "defect": null
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Workout History: Substituted Session Recorded with Accurate Exercise Name",
-      "passed": true,
-      "details": "exerciseLogs valid: True, Substituted name in table: True",
-      "defect": null
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     },
     {
-      "test": "Console Errors & Unhandled Exceptions",
-      "passed": true,
-      "details": "Page errors: [], Console warnings/errors: []",
-      "defect": null
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 3",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 3 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 3",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 3 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 3",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 3",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 3 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.btn-accordion",
+      "label": "Technique & substitutions",
+      "width": 324,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 1",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 1",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 1 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-weight",
+      "label": "Weight for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-reps",
+      "label": "Reps for set 2",
+      "width": 84,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "input.set-input.set-input-rir",
+      "label": "RIR for set 2",
+      "width": 48,
+      "height": 44,
+      "meets44": true
+    },
+    {
+      "selector": "button.set-check-btn",
+      "label": "Mark set 2 as completed",
+      "width": 44,
+      "height": 44,
+      "meets44": true
     }
   ],
-  "console_messages": [
-    "[log] Hypertrophy PWA Service Worker registrado con exito: http://127.0.0.1:8080/",
-    "[log] Hypertrophy PWA Service Worker registrado con exito: http://127.0.0.1:8080/"
-  ],
-  "page_errors": [],
-  "dialogs": [
+  "overflow_issues": [],
+  "contrast_checks": [
     {
-      "type": "confirm",
-      "message": "Deseas finalizar y guardar esta sesion en tu historial?"
+      "name": "Body Text & Background",
+      "selector": "body",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(255,255,255)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        255,
+        255,
+        255
+      ],
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "contrastRatio": 19.05,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "alert",
-      "message": "Entrenamiento Upper A finalizado y registrado."
+      "name": "Header Title",
+      "selector": ".header-titles h1",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(255,255,255)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        255,
+        255,
+        255
+      ],
+      "fontSize": "25.6px",
+      "fontWeight": "400",
+      "contrastRatio": 19.05,
+      "minRequired": 3.0,
+      "passes": true
     },
     {
-      "type": "confirm",
-      "message": "Estas seguro de eliminar este entrenamiento del historial?"
+      "name": "Header Subtitle (Dusk muted)",
+      "selector": ".sub-title",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(255,255,255)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        255,
+        255,
+        255
+      ],
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "contrastRatio": 5.77,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "confirm",
-      "message": "Deseas finalizar y guardar esta sesion en tu historial?"
+      "name": "Active Tab Text",
+      "selector": ".tab-btn.active .tab-name",
+      "fgColor": "rgb(255, 255, 255)",
+      "bgColor": "rgb(94,106,210)",
+      "fgRgb": [
+        255,
+        255,
+        255
+      ],
+      "bgRgb": [
+        94,
+        106,
+        210
+      ],
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "contrastRatio": 4.7,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "alert",
-      "message": "Entrenamiento Upper A finalizado y registrado."
+      "name": "Inactive Tab Text",
+      "selector": ".tab-btn:not(.active) .tab-name",
+      "fgColor": "rgb(40, 42, 46)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        40,
+        42,
+        46
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "contrastRatio": 13.51,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "confirm",
-      "message": "Estas seguro de eliminar este entrenamiento del historial?"
+      "name": "Tab Day Small Label",
+      "selector": ".tab-day",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "confirm",
-      "message": "Deseas finalizar y guardar esta sesion en tu historial?"
+      "name": "Session Title",
+      "selector": "#sessionTitle",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "21.6px",
+      "fontWeight": "600",
+      "contrastRatio": 17.9,
+      "minRequired": 3.0,
+      "passes": true
     },
     {
-      "type": "alert",
-      "message": "Entrenamiento Upper A finalizado y registrado."
+      "name": "Session Focus Description",
+      "selector": "#sessionFocus",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
     },
     {
-      "type": "confirm",
-      "message": "Estas seguro de eliminar este entrenamiento del historial?"
+      "name": "Metric Pill Text",
+      "selector": ".metric-pill",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 4.99,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Unit Pill Text",
+      "selector": ".unit-pill",
+      "fgColor": "rgb(75, 85, 183)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        75,
+        85,
+        183
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 5.54,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Primary Action Button",
+      "selector": ".btn-primary",
+      "fgColor": "rgb(255, 255, 255)",
+      "bgColor": "rgb(94,106,210)",
+      "fgRgb": [
+        255,
+        255,
+        255
+      ],
+      "bgRgb": [
+        94,
+        106,
+        210
+      ],
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "contrastRatio": 4.7,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Secondary Action Button",
+      "selector": ".btn-secondary",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 16.49,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Exercise Title",
+      "selector": ".exercise-title",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "18.4px",
+      "fontWeight": "600",
+      "contrastRatio": 17.9,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Target Bracket Text",
+      "selector": ".target-bracket",
+      "fgColor": "rgb(75, 85, 183)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        75,
+        85,
+        183
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "12px",
+      "fontWeight": "600",
+      "contrastRatio": 6.01,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Target RIR Pill",
+      "selector": ".target-rir",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 4.99,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Target Rest Time",
+      "selector": ".target-rest",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Badge Pause (Success green)",
+      "selector": ".badge-pause",
+      "fgColor": "rgb(37, 104, 40)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        37,
+        104,
+        40
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 5.89,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Badge Rest-Pause (Error red)",
+      "selector": ".badge-rest-pause",
+      "fgColor": "rgb(198, 40, 40)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        198,
+        40,
+        40
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 4.87,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Badge Partials (Accent 2)",
+      "selector": ".badge-partials",
+      "fgColor": "rgb(77, 81, 122)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        77,
+        81,
+        122
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 6.56,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Badge Stretch (Accent violet)",
+      "selector": ".badge-stretch",
+      "fgColor": "rgb(75, 85, 183)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        75,
+        85,
+        183
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 5.54,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Table Header Row Labels",
+      "selector": ".table-header",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Set Column Number",
+      "selector": ".set-col-num",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Set Column Previous",
+      "selector": ".set-col-prev",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(236,239,241)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        236,
+        239,
+        241
+      ],
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "contrastRatio": 4.99,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Set Input Text",
+      "selector": ".set-input",
+      "fgColor": "rgb(15, 16, 17)",
+      "bgColor": "rgb(255,255,255)",
+      "fgRgb": [
+        15,
+        16,
+        17
+      ],
+      "bgRgb": [
+        255,
+        255,
+        255
+      ],
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "contrastRatio": 19.05,
+      "minRequired": 4.5,
+      "passes": true
+    },
+    {
+      "name": "Accordion Trigger Button",
+      "selector": ".btn-accordion",
+      "fgColor": "rgb(98, 102, 109)",
+      "bgColor": "rgb(247,248,248)",
+      "fgRgb": [
+        98,
+        102,
+        109
+      ],
+      "bgRgb": [
+        247,
+        248,
+        248
+      ],
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "contrastRatio": 5.42,
+      "minRequired": 4.5,
+      "passes": true
     }
-  ]
+  ],
+  "modals": {
+    "substitutions": {
+      "title": "Substitutes: Flat Dumbbell Press",
+      "items_count": 3,
+      "items": [
+        "\n            \n              Barbell Flat Bench Press\n              \n            \n            \n              Use this substitute\n            \n          ",
+        "\n            \n              Plate-Loaded Chest Press Machine\n              \n            \n            \n              Use this substitute\n            \n          ",
+        "\n            \n              Converging Incline or Flat Machine Press\n              \n            \n            \n              Use this substitute\n            \n          "
+      ]
+    },
+    "ddp_guide": {
+      "title": "Overload Engine (DDP)",
+      "sections": [
+        "1. Dynamic Double Progression",
+        "2. Intra-Session Regulation",
+        "3. RIR & Joint Safety",
+        "4. Last-Set Intensity Techniques"
+      ]
+    },
+    "settings_unit_toggle_lbs": true,
+    "settings_deload_switch": true
+  },
+  "functionality": {
+    "deload_state": {
+      "status_text": "Deload active (50% volume, 3 to 4 RIR)",
+      "total_sets": "12 sets",
+      "unit_pill": "lbs",
+      "table_unit_col": "lbs",
+      "card_rir_target": "3 to 4 RIR"
+    },
+    "workout_and_timer": {
+      "action_btn": "Finish workout",
+      "timer_clock": "03:00",
+      "timer_label": "Flat Dumbbell Press (Set 1)",
+      "ddp_banner": "Ceiling hit on Set 1: Completed 8 reps (target: 8). DDP: Increase load 2.5% to 5% next week (+0.9 to +1.7 kg).",
+      "set_insight": "Ceiling hit on Set 1: Completed 8 reps (target: 8). DDP: Increase load 2.5% to 5% next week (+0.9 to +1.7 kg)."
+    },
+    "timer_controls": {
+      "after_plus_30": "03:30",
+      "after_minus_30": "03:00",
+      "skip_closed_bar": true
+    },
+    "tab_navigation": {
+      "active_session": "lowerA",
+      "title": "Lower A: Quad Bias & Knee Flexion",
+      "first_exercise": "Hack Squat or Leg Press"
+    }
+  },
+  "safe_area": {
+    "viewportFitCover": true,
+    "header": {
+      "paddingTop": "24px",
+      "paddingBottom": "24px",
+      "position": "relative",
+      "cssSafeInsetTopPresent": false
+    },
+    "timerBar": {
+      "bottomComputed": "16px",
+      "position": "fixed"
+    },
+    "modalCard": {
+      "paddingBottomComputed": "16px"
+    }
+  }
 }
