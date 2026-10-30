@@ -106,9 +106,14 @@ Open `http://localhost:8080` or the local Wi-Fi IP shown in the console.
 # Functional tests
 uv run python tests/qa_runner.py
 
-# Multi-viewport and accessibility checks
+# Multi-viewport and accessibility checks (touch targets, WCAG contrast,
+# hidden-state regressions, horizontal overflow). Exits 1 on any failure.
+python3 -m pip install -r tests/requirements.txt
+python3 -m playwright install chromium
 uv run python tests/run_qa.py
 ```
+
+Screenshots and `qa_results.json` are written to `tests/screenshots/`, which is git-ignored.
 
 ---
 

@@ -2,6 +2,7 @@ import asyncio
 import http.server
 import os
 import socketserver
+import sys
 import threading
 import json
 from playwright.async_api import async_playwright
@@ -45,24 +46,13 @@ def contrast_ratio(rgb1, rgb2):
     darker = min(l1, l2)
     return (lighter + 0.05) / (darker + 0.05)
 
-# No runtime style injection needed; base.css natively defines [hidden], .hidden
-INJECT_HIDDEN_FIX = ""
-
 async def run_qa():
     os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
     httpd = start_server()
     print(f"Local server started at http://localhost:{PORT}")
 
     results = {
-        "critical_bug_found": {
-            "title": "Missing CSS rule for class '.hidden'",
-            "description": "base.css only defines attribute selector '[hidden] { display: none !important; }'. However, index.html and app.js universally use class 'hidden' (e.g. class='modal-overlay hidden', classList.add('hidden'), classList.remove('hidden')). As a result, all 3 modals, rest timer bar, DDP banner, insight cards, and accordion drawers are visible and stacked on initial page load, completely blocking touch interaction.",
-            "evidence_code": {
-                "base_css_line_15": "[hidden] { display: none !important; }",
-                "styles_css": "No '.hidden' selector defined in styles.css or tokens.css",
-                "index_html_modals": "<div id='modalSettings' class='modal-overlay hidden'>... <div id='modalGuide' class='modal-overlay hidden'>... <div id='modalSubstitutions' class='modal-overlay hidden'>"
-            }
-        },
+        "regressions": {},
         "viewports": {},
         "touch_targets": [],
         "overflow_issues": [],
@@ -76,14 +66,33 @@ async def run_qa():
         browser = await p.chromium.launch()
 
         # -------------------------------------------------------------
-        # STEP 0: Capture un-injected state to prove critical bug
+        # STEP 0: Regression check — hidden-state rules must actually hide
         # -------------------------------------------------------------
-        print("\n--- Step 0: Demonstrating Un-injected Bug State ---")
+        print("\n--- Step 0: Hidden-State Regression Check ---")
         raw_page = await browser.new_page(viewport={"width": 390, "height": 844})
         await raw_page.goto(f"http://localhost:{PORT}/index.html")
         await raw_page.wait_for_selector(".app-header")
-        await raw_page.screenshot(path=f"{SCREENSHOTS_DIR}/00_bug_missing_hidden_stacked_modals.png", full_page=False)
-        print(f"Captured bug proof: {SCREENSHOTS_DIR}/00_bug_missing_hidden_stacked_modals.png")
+        results["regressions"]["hidden_class"] = await raw_page.evaluate("""() => {
+            const probeClass = document.createElement('div');
+            probeClass.className = 'hidden';
+            document.body.appendChild(probeClass);
+            const hiddenByClass = getComputedStyle(probeClass).display === 'none';
+            probeClass.remove();
+
+            const probeAttr = document.createElement('div');
+            probeAttr.hidden = true;
+            document.body.appendChild(probeAttr);
+            const hiddenByAttr = getComputedStyle(probeAttr).display === 'none';
+            probeAttr.remove();
+
+            const openOverlays = [...document.querySelectorAll('.modal-overlay')]
+                .filter(el => getComputedStyle(el).display !== 'none')
+                .map(el => el.id);
+
+            return { hiddenByClass, hiddenByAttr, openOverlays };
+        }""")
+        await raw_page.screenshot(path=f"{SCREENSHOTS_DIR}/00_hidden_state_check.png", full_page=False)
+        print(f"Captured: {SCREENSHOTS_DIR}/00_hidden_state_check.png")
         await raw_page.close()
 
         # -------------------------------------------------------------
@@ -91,7 +100,6 @@ async def run_qa():
         # -------------------------------------------------------------
         print("\n--- Step 1: Testing Desktop 1280x800 (with runtime test injection) ---")
         ctx_desktop = await browser.new_context(viewport={"width": 1280, "height": 800})
-        await ctx_desktop.add_init_script(INJECT_HIDDEN_FIX)
         page_desktop = await ctx_desktop.new_page()
         await page_desktop.goto(f"http://localhost:{PORT}/index.html")
         await page_desktop.wait_for_selector(".exercise-card")
@@ -123,7 +131,6 @@ async def run_qa():
             is_mobile=True,
             has_touch=True
         )
-        await ctx_android.add_init_script(INJECT_HIDDEN_FIX)
         page_android = await ctx_android.new_page()
         await page_android.goto(f"http://localhost:{PORT}/index.html")
         await page_android.wait_for_selector(".exercise-card")
@@ -173,7 +180,6 @@ async def run_qa():
             is_mobile=True,
             has_touch=True
         )
-        await ctx_narrow.add_init_script(INJECT_HIDDEN_FIX)
         page_narrow = await ctx_narrow.new_page()
         await page_narrow.goto(f"http://localhost:{PORT}/index.html")
         await page_narrow.wait_for_selector(".exercise-card")
@@ -222,7 +228,6 @@ async def run_qa():
             is_mobile=True,
             has_touch=True
         )
-        await ctx_iphone.add_init_script(INJECT_HIDDEN_FIX)
         page = await ctx_iphone.new_page()
         await page.goto(f"http://localhost:{PORT}/index.html")
         await page.wait_for_selector(".exercise-card")
@@ -544,10 +549,24 @@ async def run_qa():
         json.dump(results, f, indent=2)
 
     print("\n=======================================================")
-    print(" QA RUN COMPLETE! Results saved to qa_results.json")
+    print(" QA RUN COMPLETE! Results saved to tests/screenshots/qa_results.json")
     print("=======================================================")
-    print(f"Critical Bug: {results['critical_bug_found']['title']}")
     print(f"Screenshots saved: {len(os.listdir(SCREENSHOTS_DIR))} files in {SCREENSHOTS_DIR}")
+
+    hidden_state = results["regressions"].get("hidden_class", {})
+    regressions = []
+    if not hidden_state.get("hiddenByClass"):
+        regressions.append(".hidden does not hide its element (class rule missing from base.css)")
+    if not hidden_state.get("hiddenByAttr"):
+        regressions.append("[hidden] does not hide its element (attribute rule missing from base.css)")
+    if hidden_state.get("openOverlays"):
+        regressions.append(
+            "modal overlays visible on load: " + ", ".join(hidden_state["openOverlays"])
+        )
+    print(f"Hidden-state regressions: {len(regressions)}")
+    for rg in regressions:
+        print(f"  - {rg}")
+
     failed_targets = [t for t in results["touch_targets"] if not t["meets44"]]
     print(f"Failed Touch Targets (<44px): {len(failed_targets)}")
     for ft in failed_targets:
@@ -559,5 +578,11 @@ async def run_qa():
     print(f"Horizontal Overflow Issues: {len(results['overflow_issues'])}")
     for of in results["overflow_issues"]:
         print(f"  - [{of['viewport']}] {of['tag']}{('.' + of['className']) if of['className'] else ''}: right={of['right']}px > vw={of['vw']}px")
+
+    total = len(regressions) + len(failed_targets) + len(failed_contrast) + len(results["overflow_issues"])
+    if total:
+        print(f"\nRESULT: FAIL ({total} issue(s))")
+        sys.exit(1)
+    print("\nRESULT: PASS")
 
 asyncio.run(run_qa())
