@@ -321,11 +321,63 @@ def run_tests():
         record_result("Substitutions Modal Open & Content", subs_pass, f"Substitutions found: 'Barbell Flat Bench Press' in modal")
         page.screenshot(path=f"{SCREENSHOT_DIR}/15_substitutions_modal.png")
 
-        # Close modal
-        sub_modal.locator("button.modal-close").click()
+        # ---------------------------------------------------------
+        # Complete Substitution Flow Verification
+        # ---------------------------------------------------------
+        # 1. Select 'Barbell Flat Bench Press'
+        page.locator(".sub-option-item:has-text('Barbell Flat Bench Press') .btn-sub-select").click()
+        page.wait_for_timeout(300)
+
+        # 2. Verify card title changes to 'Barbell Flat Bench Press' and .badge-sub displays 'Sustituto de: Flat Dumbbell Press'
+        card_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
+        badge_el = page.locator("#card_flat_db_press .badge-sub")
+        badge_count = badge_el.count()
+        badge_text = badge_el.inner_text().strip() if badge_count > 0 else ""
+        sub_apply_pass = (card_title == "Barbell Flat Bench Press") and ("Sustituto de: Flat Dumbbell Press" in badge_text)
+        record_result("Exercise Substitution: Predefined Swap to Barbell Flat Bench Press",
+                      sub_apply_pass,
+                      f"Card title: '{card_title}', Badge: '{badge_text}'")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/15a_substitute_barbell_bench.png")
+
+        # 3. Restore original exercise and verify title reverts
+        page.locator("#card_flat_db_press .btn-restore-sub").click()
+        page.wait_for_timeout(300)
+        reverted_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
+        badge_after_revert = page.locator("#card_flat_db_press .badge-sub").count()
+        restore_pass = (reverted_title == "Flat Dumbbell Press") and (badge_after_revert == 0)
+        record_result("Exercise Substitution: Restore Original Exercise Reverts Title",
+                      restore_pass,
+                      f"Reverted title: '{reverted_title}', Badge count: {badge_after_revert}")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/15b_substitute_reverted_original.png")
+
+        # 4. Custom substitution: Open modal, type 'Incline Hammer Strength Press', click apply, verify title updates
+        page.locator("button[data-accordion='flat_db_press']").click()
         page.wait_for_timeout(200)
-        sub_modal_closed = "hidden" in (sub_modal.get_attribute("class") or "")
-        record_result("Substitutions Modal Close", sub_modal_closed, f"Modal hidden: {sub_modal_closed}")
+        page.locator("[data-show-subs='flat_db_press']").click()
+        page.wait_for_timeout(300)
+
+        page.locator("#inputCustomSub").fill("Incline Hammer Strength Press")
+        page.locator("#btnApplyCustomSub").click()
+        page.wait_for_timeout(300)
+
+        custom_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
+        custom_badge_el = page.locator("#card_flat_db_press .badge-sub")
+        custom_badge_count = custom_badge_el.count()
+        custom_badge_text = custom_badge_el.inner_text().strip() if custom_badge_count > 0 else ""
+        custom_pass = (custom_title == "Incline Hammer Strength Press") and ("Sustituto de: Flat Dumbbell Press" in custom_badge_text)
+        record_result("Exercise Substitution: Custom Substitute Input Applied",
+                      custom_pass,
+                      f"Custom title: '{custom_title}', Badge: '{custom_badge_text}'")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/15c_substitute_custom_hammer_strength.png")
+
+        # 5. Clean revert to baseline for downstream tests
+        page.locator("#card_flat_db_press .btn-restore-sub").click()
+        page.wait_for_timeout(300)
+        final_revert_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
+        record_result("Exercise Substitution: Clean Revert to Baseline",
+                      final_revert_title == "Flat Dumbbell Press",
+                      f"Final title: '{final_revert_title}'")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/15d_substitute_clean_restore.png")
 
         # ---------------------------------------------------------
         # TEST 9: DDP Guide Modal
@@ -420,6 +472,28 @@ def run_tests():
         record_result("Historical Retention (Previa Column)", previa_pass,
                       f"Previa Set 1: '{previa_set1}', Set 2: '{previa_set2}', Set 3: '{previa_set3}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/21_session_finished_previa_displayed.png")
+
+        # Test Overload Integrity: When substituted, do NOT show original exercise's previous weights!
+        page.locator("button[data-accordion='flat_db_press']").click()
+        page.wait_for_timeout(200)
+        page.locator("[data-show-subs='flat_db_press']").click()
+        page.wait_for_timeout(300)
+        page.locator(".sub-option-item:has-text('Barbell Flat Bench Press') .btn-sub-select").click()
+        page.wait_for_timeout(300)
+
+        sub_previa_set1 = page.locator("#row_flat_db_press_0 .set-col-prev").inner_text().strip()
+        overload_integrity_pass = (sub_previa_set1 == "—")
+        record_result("Overload Integrity: Substitute Hides Mismatched Machine Previa",
+                      overload_integrity_pass,
+                      f"Substituted Previa shows: '{sub_previa_set1}' (expected '—', not '30x8')")
+
+        # Restore original exercise and verify Previa restores to 30x8
+        page.locator("#card_flat_db_press .btn-restore-sub").click()
+        page.wait_for_timeout(300)
+        restored_previa_set1 = page.locator("#row_flat_db_press_0 .set-col-prev").inner_text().strip()
+        record_result("Overload Integrity: Restoring Original Exercise Restores Previa",
+                      "30x8" in restored_previa_set1,
+                      f"Restored Previa shows: '{restored_previa_set1}'")
 
         # ---------------------------------------------------------
         # TEST 12: Additional Defect Investigations
@@ -553,6 +627,70 @@ def run_tests():
         record_result("Workout History: Deletion from History List",
                       cards_after_delete == 0 and empty_visible,
                       f"Cards remaining: {cards_after_delete}, Empty state visible: {empty_visible}")
+        page.locator("#modalHistory [data-close-modal]").click()
+        page.wait_for_timeout(200)
+
+        # ---------------------------------------------------------
+        # TEST 39: Substituted Workout Completion & History Integrity
+        # ---------------------------------------------------------
+        # Switch back to Upper A tab
+        page.locator("button[data-session='upperA']").click()
+        page.wait_for_timeout(300)
+
+        # Clear any dangling active workout from previous test investigations if present
+        if page.evaluate("() => Boolean(state.isWorkoutActive)"):
+            page.locator("#btnToggleWorkout").click()
+            page.wait_for_timeout(400)
+            page.locator("#btnHistory").click()
+            page.wait_for_timeout(300)
+            if page.locator(".btn-history-delete").count() > 0:
+                page.locator(".btn-history-delete").first.click()
+                page.wait_for_timeout(300)
+            page.locator("#modalHistory [data-close-modal]").click()
+            page.wait_for_timeout(200)
+
+        page.locator("#btnToggleWorkout").click()
+        page.wait_for_timeout(300)
+
+        # Substitute Flat DB Press with Barbell Flat Bench Press
+        page.locator("button[data-accordion='flat_db_press']").click()
+        page.wait_for_timeout(200)
+        page.locator("[data-show-subs='flat_db_press']").click()
+        page.wait_for_timeout(300)
+        page.locator(".sub-option-item:has-text('Barbell Flat Bench Press') .btn-sub-select").click()
+        page.wait_for_timeout(300)
+
+        # Fill and complete Set 1
+        page.locator("#row_flat_db_press_0 .set-input-weight").fill("75")
+        page.locator("#row_flat_db_press_0 .set-input-reps").fill("8")
+        page.locator("#row_flat_db_press_0 .set-input-rir").fill("2")
+        page.locator("#row_flat_db_press_0 .set-check-btn").click()
+        page.wait_for_timeout(200)
+        page.locator("#btnTimerSkip").click()
+        page.wait_for_timeout(200)
+
+        # Finish workout
+        page.locator("#btnToggleWorkout").click()
+        page.wait_for_timeout(400)
+
+        # Open History modal and verify substituted exercise name is displayed
+        page.locator("#btnHistory").click()
+        page.wait_for_timeout(300)
+        page.locator(".btn-toggle-detail").first.click()
+        page.wait_for_timeout(200)
+
+        sub_hist_table_text = page.locator(".history-card-details .history-table tbody").first.inner_text()
+        sub_meta_check = page.evaluate("() => { const log = state.history[0]?.exerciseLogs?.['flat_db_press']; return Boolean(log && log.exerciseName === 'Barbell Flat Bench Press' && log.isSubstituted === true && log.originalName === 'Flat Dumbbell Press'); }")
+        top_set_hist = page.locator(".history-card").first.inner_text()
+        sub_hist_pass = sub_meta_check and ("Barbell Flat Bench Press" in sub_hist_table_text) and ("Barbell Flat Bench Press" in top_set_hist)
+        record_result("Workout History: Substituted Session Recorded with Accurate Exercise Name",
+                      sub_hist_pass,
+                      f"exerciseLogs valid: {sub_meta_check}, Substituted name in table: {'Barbell Flat Bench Press' in sub_hist_table_text}")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/28_substituted_history_recorded.png")
+
+        # Clean up history entry
+        page.locator(".btn-history-delete").first.click()
+        page.wait_for_timeout(300)
         page.locator("#modalHistory [data-close-modal]").click()
         page.wait_for_timeout(200)
 

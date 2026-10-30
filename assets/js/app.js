@@ -32,7 +32,7 @@ const ROUTINE_DATA = {
         },
         cues: 'Escapulas retraidas y deprimidas contra la banca. Descenso profundo para maximo estiramiento pectoral; codos a 45 grados respecto al torso. Pausa de 1s en el fondo.',
         substitutions: [
-          'Barbell Flat Bench Press (3 x 6 a 8 reps a 2 RIR)',
+          'Barbell Flat Bench Press',
           'Plate-Loaded Chest Press Machine',
           'Converging Incline or Flat Machine Press'
         ]
@@ -564,6 +564,7 @@ const state = {
   logs: {},
   history: [],
   draft: {},
+  substitutions: {},
   audioCtx: null,
   timer: {
     interval: null,
@@ -680,16 +681,24 @@ function loadState() {
     const savedDraft = localStorage.getItem(STORAGE_KEYS.ACTIVE_DRAFT);
     if (savedDraft) {
       state.draft = JSON.parse(savedDraft);
+      if (state.draft && typeof state.draft.substitutions === 'object' && state.draft.substitutions !== null) {
+        state.substitutions = state.draft.substitutions;
+      } else {
+        state.substitutions = {};
+      }
       if (state.draft.isWorkoutActive) {
         state.isWorkoutActive = true;
         state.activeWorkoutSessionId = state.draft.activeWorkoutSessionId || state.draft.currentSessionId || 'upperA';
         state.workoutStartTime = state.draft.workoutStartTime || Date.now();
         state.currentSessionId = state.draft.currentSessionId || 'upperA';
       }
+    } else {
+      state.substitutions = {};
     }
   } catch (err) {
     console.warn('Corrupted active draft in storage, resetting draft:', err);
     state.draft = {};
+    state.substitutions = {};
   }
 }
 
@@ -710,10 +719,12 @@ function saveSettings() {
 }
 
 function saveDraft() {
+  if (!state.draft) state.draft = {};
   state.draft.isWorkoutActive = state.isWorkoutActive;
   state.draft.activeWorkoutSessionId = state.activeWorkoutSessionId;
   state.draft.workoutStartTime = state.workoutStartTime;
   state.draft.currentSessionId = state.currentSessionId;
+  state.draft.substitutions = state.substitutions || {};
   saveStorageItem(STORAGE_KEYS.ACTIVE_DRAFT, state.draft);
 }
 
@@ -877,6 +888,10 @@ function renderSession() {
     card.className = 'exercise-card';
     card.id = `card_${exercise.id}`;
 
+    const subData = state.substitutions && state.substitutions[exercise.id];
+    const isSubstituted = Boolean(subData && subData.name);
+    const exerciseDisplayName = isSubstituted ? subData.name : exercise.name;
+
     const plannedSets = state.isDeloadMode 
       ? Math.max(1, Math.round(exercise.sets * 0.5)) 
       : exercise.sets;
@@ -888,8 +903,32 @@ function renderSession() {
       const setNum = i + 1;
       
       let prevText = '—';
+      const currentExerciseName = isSubstituted ? subData.name : exercise.name;
+      let matchingPrevSets = null;
+
       if (prevSessionData && prevSessionData.exercises && prevSessionData.exercises[exercise.id]) {
-        const prevSet = prevSessionData.exercises[exercise.id][i];
+        const prevMeta = prevSessionData.exerciseLogs && prevSessionData.exerciseLogs[exercise.id];
+        const prevName = prevMeta ? prevMeta.exerciseName : exercise.name;
+        if (prevName === currentExerciseName) {
+          matchingPrevSets = prevSessionData.exercises[exercise.id];
+        }
+      }
+
+      if (!matchingPrevSets && Array.isArray(state.history)) {
+        for (const h of state.history) {
+          if (h.sessionId === session.id && h.exercises && h.exercises[exercise.id]) {
+            const hMeta = h.exerciseLogs && h.exerciseLogs[exercise.id];
+            const hName = hMeta ? hMeta.exerciseName : exercise.name;
+            if (hName === currentExerciseName) {
+              matchingPrevSets = h.exercises[exercise.id];
+              break;
+            }
+          }
+        }
+      }
+
+      if (matchingPrevSets && matchingPrevSets[i]) {
+        const prevSet = matchingPrevSets[i];
         if (prevSet && prevSet.weight !== undefined && prevSet.weight !== null && prevSet.reps) {
           prevText = `${prevSet.weight}x${prevSet.reps}`;
         }
@@ -934,13 +973,23 @@ function renderSession() {
     card.innerHTML = `
       <div class="exercise-header">
         <div class="exercise-top-row">
-          <div class="exercise-title">${exercise.name}</div>
+          <div class="exercise-title">${exerciseDisplayName}</div>
+          ${isSubstituted ? `
+            <button type="button" class="btn-restore-sub" data-restore-sub="${exercise.id}" title="Restaurar ejercicio original" aria-label="Restaurar ejercicio original">
+              ↺ Restaurar
+            </button>
+          ` : ''}
         </div>
         <div class="exercise-target-line">
           <span class="target-bracket">${plannedSets} series x ${exercise.targetReps[0]} a ${exercise.targetReps[1]} reps</span>
           <span class="target-rir">${rirLabel}</span>
           <span class="target-rest">Descanso: ${Math.round(exercise.restSeconds / 60 * 10) / 10} min</span>
         </div>
+        ${isSubstituted ? `
+          <div class="technique-badge badge-sub">
+            Sustituto de: ${exercise.name}
+          </div>
+        ` : ''}
         ${exercise.technique ? `
           <div class="technique-badge ${exercise.technique.badgeClass}">
             ${exercise.technique.badge}
@@ -1030,6 +1079,14 @@ function attachExerciseCardListeners() {
     };
   });
 
+  document.querySelectorAll('[data-restore-sub]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const exId = btn.getAttribute('data-restore-sub');
+      if (exId) restoreOriginalExercise(exId);
+    };
+  });
+
   document.querySelectorAll('.set-input').forEach(input => {
     input.oninput = (e) => {
       const exId = e.target.getAttribute('data-ex');
@@ -1080,7 +1137,9 @@ function attachExerciseCardListeners() {
         }
 
         if (exercise && exercise.restSeconds) {
-          startRestTimer(exercise.restSeconds, `${exercise.name} (Serie ${setIdx + 1})`);
+          const subData = state.substitutions && state.substitutions[exId];
+          const timerName = (subData && subData.name) || exercise.name;
+          startRestTimer(exercise.restSeconds, `${timerName} (Serie ${setIdx + 1})`);
         }
       } else {
         row.classList.remove('completed');
@@ -1096,26 +1155,161 @@ function attachExerciseCardListeners() {
   });
 }
 
+function substituteExercise(exerciseId, substituteName, isCustom = false) {
+  if (!exerciseId || !substituteName) return;
+  const cleanName = typeof substituteName === 'string' ? substituteName.trim() : String(substituteName);
+  if (!cleanName) return;
+  if (!state.substitutions) state.substitutions = {};
+  state.substitutions[exerciseId] = {
+    name: cleanName,
+    isCustom: Boolean(isCustom)
+  };
+  saveDraft();
+  renderSession();
+  const modal = document.getElementById('modalSubstitutions');
+  if (modal) modal.classList.add('hidden');
+}
+
+function restoreOriginalExercise(exerciseId) {
+  if (!exerciseId) return;
+  if (state.substitutions && state.substitutions[exerciseId]) {
+    delete state.substitutions[exerciseId];
+    saveDraft();
+    renderSession();
+  }
+  const modal = document.getElementById('modalSubstitutions');
+  if (modal) modal.classList.add('hidden');
+}
+
 function openSubstitutionsModal(exerciseId) {
   const session = ROUTINE_DATA[state.currentSessionId];
-  const ex = session.exercises.find(e => e.id === exerciseId);
+  const ex = session?.exercises.find(e => e.id === exerciseId);
   if (!ex) return;
 
   const modal = document.getElementById('modalSubstitutions');
   const title = document.getElementById('subModalTitle');
   const body = document.getElementById('subModalBody');
 
-  if (title) title.textContent = `Sustitutos: ${ex.name}`;
-  if (body) {
-    let listHtml = `<p style="font-size:var(--text-xs); color:var(--color-muted); margin-bottom:var(--space-sm);">
-      Alternativas con identico perfil de resistencia y estiramiento:
-    </p><ul style="padding-left:var(--space-md); line-height:1.6; font-size:var(--text-xs);">`;
+  const subData = state.substitutions && state.substitutions[exerciseId];
+  const isCurrentlySubbed = Boolean(subData && subData.name);
 
-    ex.substitutions.forEach(sub => {
-      listHtml += `<li><strong>${sub}</strong></li>`;
+  if (title) {
+    title.textContent = isCurrentlySubbed
+      ? `Sustitución activa: ${subData.name}`
+      : `Sustitutos: ${ex.name}`;
+  }
+
+  if (body) {
+    let html = '';
+
+    if (isCurrentlySubbed) {
+      html += `
+        <div class="sub-active-banner">
+          <div class="sub-active-info">
+            <span class="sub-active-label">Sustituyendo actualmente a:</span>
+            <strong class="sub-active-orig">${ex.name}</strong>
+            <span class="sub-active-name">Actual: ${subData.name}</span>
+          </div>
+          <button type="button" class="btn-restore-prominent" id="btnRestoreProminent" aria-label="Restaurar ejercicio original">
+            ↺ Restaurar ejercicio original
+          </button>
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="sub-section-header">
+        <p class="sub-section-desc">
+          Alternativas con idéntico perfil de resistencia y estiramiento:
+        </p>
+      </div>
+      <ul class="sub-options-list">
+    `;
+
+    const alternatives = Array.isArray(ex.substitutions) ? ex.substitutions : [];
+    if (alternatives.length === 0) {
+      html += `<li class="sub-empty">No hay sustitutos predefinidos para este ejercicio.</li>`;
+    } else {
+      alternatives.forEach((sub, idx) => {
+        const isThisActive = isCurrentlySubbed && subData.name === sub;
+        html += `
+          <li class="sub-option-item ${isThisActive ? 'is-active' : ''}" data-sub-idx="${idx}">
+            <div class="sub-option-text">
+              <strong class="sub-option-name">${sub}</strong>
+              ${isThisActive ? '<span class="sub-active-chip">En uso</span>' : ''}
+            </div>
+            <button type="button" class="btn-sub-select" data-sub-idx="${idx}" aria-label="Usar sustituto ${sub}">
+              Usar este sustituto
+            </button>
+          </li>
+        `;
+      });
+    }
+
+    html += `
+      </ul>
+      <div class="sub-custom-card">
+        <label for="inputCustomSub" class="sub-custom-label">O escribe el nombre de otra máquina/ejercicio:</label>
+        <div class="sub-custom-input-group">
+          <input type="text" id="inputCustomSub" class="sub-custom-input" placeholder="O escribe el nombre de otra máquina/ejercicio" aria-label="Nombre de sustituto personalizado" autocomplete="off">
+          <button type="button" id="btnApplyCustomSub" class="btn-apply-sub">Aplicar</button>
+        </div>
+      </div>
+    `;
+
+    body.innerHTML = html;
+
+    if (isCurrentlySubbed) {
+      const btnRestore = document.getElementById('btnRestoreProminent');
+      if (btnRestore) {
+        btnRestore.onclick = () => {
+          restoreOriginalExercise(exerciseId);
+        };
+      }
+    }
+
+    body.querySelectorAll('.sub-option-item').forEach(item => {
+      const idx = parseInt(item.getAttribute('data-sub-idx'), 10);
+      const selectedSub = alternatives[idx];
+      const btn = item.querySelector('.btn-sub-select');
+
+      const chooseSub = () => {
+        if (selectedSub) {
+          substituteExercise(exerciseId, selectedSub, false);
+        }
+      };
+
+      if (btn) {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          chooseSub();
+        };
+      }
+      item.onclick = () => {
+        chooseSub();
+      };
     });
-    listHtml += `</ul>`;
-    body.innerHTML = listHtml;
+
+    const btnApplyCustom = document.getElementById('btnApplyCustomSub');
+    const inputCustom = document.getElementById('inputCustomSub');
+    const handleApplyCustom = () => {
+      const val = (inputCustom?.value || '').trim();
+      if (val) {
+        substituteExercise(exerciseId, val, true);
+      }
+    };
+
+    if (btnApplyCustom) {
+      btnApplyCustom.onclick = handleApplyCustom;
+    }
+    if (inputCustom) {
+      inputCustom.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleApplyCustom();
+        }
+      };
+    }
   }
 
   if (modal) modal.classList.remove('hidden');
@@ -1225,6 +1419,14 @@ function setupGlobalListeners() {
     };
   });
 
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    };
+  });
+
   const btnUnitKg = document.getElementById('btnUnitKg');
   const btnUnitLbs = document.getElementById('btnUnitLbs');
   if (btnUnitKg && btnUnitLbs) {
@@ -1295,6 +1497,7 @@ function setupGlobalListeners() {
         state.logs = {};
         state.history = [];
         state.draft = {};
+        state.substitutions = {};
         saveLogs();
         saveHistory();
         saveDraft();
@@ -1323,11 +1526,22 @@ function finishWorkoutSession() {
     weightUnit: state.weightUnit,
     isDeloadMode: state.isDeloadMode,
     durationMinutes: state.workoutStartTime ? Math.max(1, Math.round((now - state.workoutStartTime) / 60000)) : 0,
-    exercises: {}
+    exercises: {},
+    exerciseLogs: {}
   };
 
   session.exercises.forEach(ex => {
     completedSession.exercises[ex.id] = [];
+    const sub = state.substitutions && state.substitutions[ex.id];
+    const subName = (sub && sub.name) ? String(sub.name).trim() : null;
+    const isSub = Boolean(subName);
+
+    completedSession.exerciseLogs[ex.id] = {
+      exerciseName: isSub ? subName : ex.name,
+      isSubstituted: !!sub,
+      originalName: ex.name
+    };
+
     const plannedSets = state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
 
     for (let i = 0; i < plannedSets; i++) {
@@ -1353,6 +1567,7 @@ function finishWorkoutSession() {
   state.activeWorkoutSessionId = null;
   state.workoutStartTime = null;
   state.draft = {};
+  state.substitutions = {};
   saveDraft();
 
   const globalBanner = document.getElementById('ddpBanner');
@@ -1443,7 +1658,8 @@ function renderHistorySessions() {
     if (firstEx && h.exercises?.[firstEx.id]?.[0]) {
       const topSet = h.exercises[firstEx.id][0];
       if (topSet.reps > 0) {
-        topSetSummary = `${firstEx.name}: ${topSet.weight}${h.weightUnit || 'kg'} × ${topSet.reps} reps`;
+        const firstExName = h.exerciseLogs?.[firstEx.id]?.exerciseName || firstEx.name;
+        topSetSummary = `${firstExName}: ${topSet.weight}${h.weightUnit || 'kg'} × ${topSet.reps} reps`;
       }
     }
 
@@ -1480,10 +1696,11 @@ function renderHistorySessions() {
     if (sessionObj) {
       sessionObj.exercises.forEach(ex => {
         const loggedSets = h.exercises?.[ex.id] || [];
+        const recordedName = h.exerciseLogs?.[ex.id]?.exerciseName || ex.name;
         loggedSets.forEach((s, idx) => {
           html += `
             <tr>
-              <td>${idx === 0 ? ex.name : ''}</td>
+              <td>${idx === 0 ? recordedName : ''}</td>
               <td style="text-align:center;">${idx + 1}</td>
               <td style="text-align:center;">${s.weight || '—'}</td>
               <td style="text-align:center;">${s.reps || '—'}</td>
@@ -1869,8 +2086,9 @@ function exportSingleHistoryMarkdown(id) {
   if (session) {
     session.exercises.forEach(ex => {
       const sets = item.exercises?.[ex.id] || [];
+      const recordedName = item.exerciseLogs?.[ex.id]?.exerciseName || ex.name;
       sets.forEach((s, idx) => {
-        md += `| ${ex.name} | ${idx + 1} | ${s.weight || '—'} | ${s.reps || '—'} | ${s.rir !== undefined ? s.rir : '—'} |\n`;
+        md += `| ${recordedName} | ${idx + 1} | ${s.weight || '—'} | ${s.reps || '—'} | ${s.rir !== undefined ? s.rir : '—'} |\n`;
       });
     });
   }
@@ -1905,6 +2123,8 @@ function exportWorkoutMarkdown() {
 
   session.exercises.forEach(ex => {
     const plannedSets = state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
+    const sub = state.substitutions && state.substitutions[ex.id];
+    const exDisplayName = (sub && sub.name) ? sub.name : ex.name;
     for (let i = 0; i < plannedSets; i++) {
       const draftKey = `${session.id}_${ex.id}_${i}`;
       const draftData = state.draft[draftKey] || {};
@@ -1921,7 +2141,7 @@ function exportWorkoutMarkdown() {
         : (loggedData?.rir !== undefined ? loggedData.rir : '—');
 
       const note = i === 0 ? 'Top Set DDP' : (ex.technique ? ex.technique.badge : '');
-      md += `| ${ex.name} | ${i + 1} | ${w} | ${r} | ${rir} | ${note} |\n`;
+      md += `| ${exDisplayName} | ${i + 1} | ${w} | ${r} | ${rir} | ${note} |\n`;
     }
   });
 
