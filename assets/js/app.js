@@ -988,20 +988,18 @@ function getPreviousProgressionRecommendation(exercise, matchingPrevSets) {
 
   if (prevReps >= maxReps) {
     if (prevWeight > 0) {
-      const minInc = (prevWeight * 0.025).toFixed(1);
-      const maxInc = (prevWeight * 0.05).toFixed(1);
       const nextMin = (prevWeight * 1.025).toFixed(1);
       const nextMax = (prevWeight * 1.05).toFixed(1);
       return {
         shouldIncrease: true,
         badge: 'Increase weight',
-        message: `Prev Set 1: ${prevWeight} ${unit} x ${prevReps} reps (ceiling ${maxReps} hit). Add 2.5%–5% (+${minInc} to +${maxInc} ${unit} → ${nextMin}–${nextMax} ${unit}).`
+        message: `↑ ${nextMin}–${nextMax} ${unit} (+2.5–5% · prev ${prevWeight}×${prevReps})`
       };
     }
     return {
       shouldIncrease: true,
       badge: 'Increase load',
-      message: `Prev Set 1: ${prevReps} reps (ceiling ${maxReps} hit). Add external load today.`
+      message: `↑ Add load (prev ${prevReps} reps)`
     };
   }
 
@@ -1010,7 +1008,7 @@ function getPreviousProgressionRecommendation(exercise, matchingPrevSets) {
   return {
     shouldIncrease: false,
     badge: 'Keep weight',
-    message: `Prev Set 1: ${prevWeight} ${unit} x ${prevReps} reps (below ${maxReps} ceiling). Stay at ${weightLabel} and push for ${nextRepTarget}–${maxReps} reps.`
+    message: `= ${weightLabel} · aim ${nextRepTarget}–${maxReps} reps (prev ${prevWeight}×${prevReps})`
   };
 }
 
@@ -1175,13 +1173,16 @@ function renderSession() {
 
       ${prevRecommendation ? `
         <div class="prev-progression-window ${prevRecommendation.shouldIncrease ? 'prev-increase' : 'prev-keep'}" data-prev-progression="${exercise.id}" role="status">
-          <div class="prev-progression-header">
-            <span class="prev-progression-badge">${prevRecommendation.badge}</span>
-            <button type="button" class="btn-fill-prev" data-fill-prev="${exercise.id}" aria-label="Fill sets from previous session for ${exerciseDisplayName}">
-              Fill from Prev
-            </button>
+          <div class="prev-progression-main">
+            <span class="prev-progression-dot" aria-hidden="true"></span>
+            <div class="prev-progression-copy">
+              <span class="prev-progression-badge">${prevRecommendation.badge}</span>
+              <span class="prev-progression-msg">${prevRecommendation.message}</span>
+            </div>
           </div>
-          <p class="prev-progression-msg">${prevRecommendation.message}</p>
+          <button type="button" class="btn-fill-prev" data-fill-prev="${exercise.id}" aria-label="Fill sets from previous session for ${exerciseDisplayName}">
+            Fill Prev
+          </button>
         </div>
       ` : ''}
 

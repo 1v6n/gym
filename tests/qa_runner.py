@@ -514,7 +514,7 @@ def run_tests():
         prev_window = page.locator("[data-prev-progression='flat_db_press']")
         prev_window_visible = prev_window.count() > 0 and prev_window.is_visible()
         prev_window_text = prev_window.inner_text() if prev_window_visible else ""
-        prev_window_pass = prev_window_visible and ("INCREASE WEIGHT" in prev_window_text.upper()) and ("30 kg x 8 reps" in prev_window_text)
+        prev_window_pass = prev_window_visible and ("INCREASE WEIGHT" in prev_window_text.upper()) and ("30×8" in prev_window_text)
         record_result("Persistent Progression Window: Shows Increase Weight From Previous Set 1",
                       prev_window_pass,
                       f"Visible: {prev_window_visible}, Text: '{prev_window_text.replace(chr(10), ' ')}'")

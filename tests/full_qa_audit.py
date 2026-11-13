@@ -90,7 +90,7 @@ def run_full_qa():
 
         keep_win = page.locator("[data-prev-progression='flat_db_press']")
         keep_text = keep_win.inner_text() if keep_win.count() > 0 else ""
-        keep_ok = keep_win.is_visible() and ("KEEP WEIGHT" in keep_text.upper()) and ("30 kg x 6 reps" in keep_text)
+        keep_ok = keep_win.is_visible() and ("KEEP WEIGHT" in keep_text.upper()) and ("30×6" in keep_text)
         record("Progression Window (Keep Weight persists after reload)", keep_ok, keep_text.replace("\n", " "))
         w_ph = page.locator("#row_flat_db_press_0 .set-input-weight").get_attribute("placeholder")
         r_ph = page.locator("#row_flat_db_press_0 .set-input-reps").get_attribute("placeholder")
@@ -150,7 +150,7 @@ def run_full_qa():
         card_title_after_reload = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
         custom_prev_win = page.locator("[data-prev-progression='flat_db_press']").inner_text()
         record("Custom Exercise Remains Active After Finish & Reload", card_title_after_reload == "Nautilus Nitro Chest Press", card_title_after_reload)
-        record("Custom Exercise Has Its Own Progression Window", "65 kg x 8 reps" in custom_prev_win, custom_prev_win.replace("\n", " "))
+        record("Custom Exercise Has Its Own Progression Window", "65×8" in custom_prev_win, custom_prev_win.replace("\n", " "))
 
         # Restore original, reopen subs modal, verify Saved custom still exists, then delete it
         page.locator("#card_flat_db_press .btn-restore-sub").click()

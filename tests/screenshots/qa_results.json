@@ -189,7 +189,7 @@
     {
       "test": "Persistent Progression Window: Shows Increase Weight From Previous Set 1",
       "passed": true,
-      "details": "Visible: True, Text: 'INCREASE WEIGHT Fill from Prev  Prev Set 1: 30 kg x 8 reps (ceiling 8 hit). Add 2.5%\u20135% (+0.8 to +1.5 kg \u2192 30.7\u201331.5 kg).'",
+      "details": "Visible: True, Text: 'Increase weight \u2191 30.7\u201331.5 kg (+2.5\u20135% \u00b7 prev 30\u00d78) Fill Prev'",
       "defect": null
     },
     {
