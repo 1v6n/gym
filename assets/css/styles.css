@@ -270,8 +270,8 @@
 }
 
 .btn-secondary {
-  background: var(--color-paper-3);
-  border: var(--rule-hair) solid var(--color-rule);
+  background: transparent;
+  border: var(--rule-hair) solid var(--color-rule-strong);
   color: var(--color-ink);
   border-radius: var(--radius-inner);
   padding: var(--space-sm) var(--space-md);
@@ -863,10 +863,9 @@
   right: var(--space-sm);
   z-index: var(--z-sticky);
   background: var(--color-paper-2);
-  border: var(--rule-hair) solid var(--color-rule);
+  border: var(--rule-hair) solid var(--color-rule-strong);
   border-radius: var(--radius-card);
   overflow: hidden;
-  box-shadow: var(--shadow-sheet);
 }
 
 .timer-bar-content {
@@ -2035,9 +2034,9 @@ body { min-height: 100dvh; }
   opacity: 1;
 }
 .btn-secondary {
-  background: var(--color-paper-3);
+  background: transparent;
   color: var(--color-ink);
-  border: var(--rule-hair) solid var(--color-rule);
+  border: var(--rule-hair) solid var(--color-rule-strong);
   border-radius: var(--radius-inner);
 }
 
@@ -2067,9 +2066,9 @@ body { min-height: 100dvh; }
 }
 .target-rest { color: var(--color-muted); }
 .technique-badge {
-  background: var(--color-paper-3);
+  background: transparent;
   border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-inner);
+  border-radius: var(--radius-pill);
 }
 .btn-accordion { color: var(--color-muted); }
 .sets-table { padding: 0 var(--space-md) var(--space-sm); }
@@ -2095,16 +2094,15 @@ body { min-height: 100dvh; }
   border-radius: var(--radius-inner);
 }
 .set-row.completed .set-check-btn {
-  background: var(--color-success);
+  background: transparent;
   border-color: var(--color-success);
-  color: var(--color-accent-ink);
+  color: var(--color-success);
 }
 
 .timer-bar {
   background: var(--color-paper-2);
   border: var(--rule-hair) solid var(--color-rule-strong);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sheet);
 }
 .timer-clock {
   font-family: var(--font-mono);
