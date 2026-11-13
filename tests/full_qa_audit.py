@@ -92,6 +92,14 @@ def run_full_qa():
         keep_text = keep_win.inner_text() if keep_win.count() > 0 else ""
         keep_ok = keep_win.is_visible() and ("KEEP WEIGHT" in keep_text.upper()) and ("30 kg x 6 reps" in keep_text)
         record("Progression Window (Keep Weight persists after reload)", keep_ok, keep_text.replace("\n", " "))
+        w_ph = page.locator("#row_flat_db_press_0 .set-input-weight").get_attribute("placeholder")
+        r_ph = page.locator("#row_flat_db_press_0 .set-input-reps").get_attribute("placeholder")
+        record("Prev Input Placeholders Shown", w_ph == "30" and r_ph == "6", f"weight placeholder='{w_ph}', reps placeholder='{r_ph}'")
+        page.locator("[data-fill-prev='flat_db_press']").click()
+        page.wait_for_timeout(150)
+        filled_w = page.locator("#row_flat_db_press_0 .set-input-weight").input_value()
+        filled_r = page.locator("#row_flat_db_press_0 .set-input-reps").input_value()
+        record("Fill from Prev Button Populates Empty Inputs", filled_w == "30" and filled_r == "6", f"filled weight='{filled_w}', reps='{filled_r}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/prev_window_keep_dark.png")
 
         # 4. Persistent Increase-Weight Progression Window (Set 1 >= ceiling)

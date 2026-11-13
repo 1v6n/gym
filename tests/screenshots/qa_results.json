@@ -189,7 +189,7 @@
     {
       "test": "Persistent Progression Window: Shows Increase Weight From Previous Set 1",
       "passed": true,
-      "details": "Visible: True, Text: 'INCREASE WEIGHT  Prev Set 1: 30 kg x 8 reps (ceiling 8 hit). Add 2.5%\u20135% (+0.8 to +1.5 kg \u2192 30.7\u201331.5 kg).'",
+      "details": "Visible: True, Text: 'INCREASE WEIGHT Fill from Prev  Prev Set 1: 30 kg x 8 reps (ceiling 8 hit). Add 2.5%\u20135% (+0.8 to +1.5 kg \u2192 30.7\u201331.5 kg).'",
       "defect": null
     },
     {
@@ -273,13 +273,17 @@
     {
       "test": "Console Errors & Unhandled Exceptions",
       "passed": true,
-      "details": "Page errors: [], Console warnings/errors: []",
+      "details": "Page errors: [], Console warnings/errors: ['[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied', '[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied', '[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied', '[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied']",
       "defect": null
     }
   ],
   "console_messages": [
     "[log] Hypertrophy PWA Service Worker registered successfully: http://127.0.0.1:8080/",
-    "[log] Hypertrophy PWA Service Worker registered successfully: http://127.0.0.1:8080/"
+    "[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied",
+    "[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied",
+    "[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied",
+    "[log] Hypertrophy PWA Service Worker registered successfully: http://127.0.0.1:8080/",
+    "[warning] Screen Wake Lock request failed, continuing without wake lock: NotAllowedError: Wake Lock permission request denied"
   ],
   "page_errors": [],
   "dialogs": [

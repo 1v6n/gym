@@ -573,6 +573,7 @@ const state = {
   substitutions: {},
   customSubstitutions: {},
   audioCtx: null,
+  wakeLockSentinel: null,
   timer: {
     interval: null,
     hideTimeout: null,
@@ -627,6 +628,57 @@ function playCompletionChime() {
     } catch (err) {
       console.warn('Haptic vibration failed, continuing without vibration:', err);
     }
+  }
+}
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator) || !state.isWorkoutActive) return;
+  if (state.wakeLockSentinel && !state.wakeLockSentinel.released) return;
+  try {
+    state.wakeLockSentinel = await navigator.wakeLock.request('screen');
+    state.wakeLockSentinel.addEventListener('release', () => {
+      state.wakeLockSentinel = null;
+    });
+  } catch (err) {
+    console.warn('Screen Wake Lock request failed, continuing without wake lock:', err);
+    state.wakeLockSentinel = null;
+  }
+}
+
+async function releaseWakeLock() {
+  if (!state.wakeLockSentinel) return;
+  try {
+    await state.wakeLockSentinel.release();
+  } catch (err) {
+    console.warn('Screen Wake Lock release failed:', err);
+  } finally {
+    state.wakeLockSentinel = null;
+  }
+}
+
+function requestRestNotificationPermission() {
+  if (!state.audioVibrate || !('Notification' in window)) return;
+  if (Notification.permission !== 'default') return;
+  try {
+    const res = Notification.requestPermission();
+    if (res && typeof res.catch === 'function') {
+      res.catch((err) => console.warn('Notification permission request dismissed:', err));
+    }
+  } catch (err) {
+    console.warn('Notification permission request failed:', err);
+  }
+}
+
+function sendRestCompleteNotification(exerciseName) {
+  if (!state.audioVibrate || !('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    new Notification('Rest complete', {
+      body: `${exerciseName} — ready for your next set.`,
+      tag: 'hypertrophy-rest-timer'
+    });
+  } catch (err) {
+    console.warn('Rest notification failed, continuing with audio/vibrate:', err);
   }
 }
 
@@ -820,6 +872,7 @@ function startRestTimer(seconds, exerciseName = 'Rest') {
       if (state.timer.remainingSeconds <= 0) {
         clearInterval(state.timer.interval);
         playCompletionChime();
+        sendRestCompleteNotification(exerciseName);
         if (bar) {
           state.timer.hideTimeout = setTimeout(() => {
             bar.classList.add('hidden');
@@ -1036,10 +1089,14 @@ function renderSession() {
       const setNum = i + 1;
       
       let prevText = '—';
+      let weightPlaceholder = state.weightUnit;
+      let repsPlaceholder = 'reps';
       if (matchingPrevSets && matchingPrevSets[i]) {
         const prevSet = matchingPrevSets[i];
         if (prevSet && prevSet.weight !== undefined && prevSet.weight !== null && prevSet.reps) {
           prevText = `${prevSet.weight}x${prevSet.reps}`;
+          weightPlaceholder = String(prevSet.weight);
+          repsPlaceholder = String(prevSet.reps);
         }
       }
 
@@ -1056,12 +1113,12 @@ function renderSession() {
           <div class="set-col-prev" title="Previous">${prevText}</div>
           <div>
             <input type="number" step="0.5" inputmode="decimal" class="set-input set-input-weight" 
-                   data-ex="${exercise.id}" data-set="${i}" placeholder="${state.weightUnit}" 
+                   data-ex="${exercise.id}" data-set="${i}" placeholder="${weightPlaceholder}" 
                    value="${valWeight}" aria-label="Weight for set ${setNum}">
           </div>
           <div>
             <input type="number" inputmode="numeric" class="set-input set-input-reps" 
-                   data-ex="${exercise.id}" data-set="${i}" placeholder="reps" 
+                   data-ex="${exercise.id}" data-set="${i}" placeholder="${repsPlaceholder}" 
                    value="${valReps}" aria-label="Reps for set ${setNum}">
           </div>
           <div>
@@ -1120,6 +1177,9 @@ function renderSession() {
         <div class="prev-progression-window ${prevRecommendation.shouldIncrease ? 'prev-increase' : 'prev-keep'}" data-prev-progression="${exercise.id}" role="status">
           <div class="prev-progression-header">
             <span class="prev-progression-badge">${prevRecommendation.badge}</span>
+            <button type="button" class="btn-fill-prev" data-fill-prev="${exercise.id}" aria-label="Fill sets from previous session for ${exerciseDisplayName}">
+              Fill from Prev
+            </button>
           </div>
           <p class="prev-progression-msg">${prevRecommendation.message}</p>
         </div>
@@ -1211,6 +1271,44 @@ function attachExerciseCardListeners() {
     };
   });
 
+  document.querySelectorAll('[data-fill-prev]').forEach(btn => {
+    btn.onclick = () => {
+      const exId = btn.getAttribute('data-fill-prev');
+      const session = ROUTINE_DATA[state.currentSessionId];
+      const ex = session?.exercises.find(e => e.id === exId);
+      if (!ex) return;
+
+      const subData = state.substitutions && state.substitutions[ex.id];
+      const currentName = (subData && subData.name) ? subData.name : ex.name;
+      const prevSets = getMatchingPreviousSets(session.id, ex, currentName);
+      if (!Array.isArray(prevSets)) return;
+
+      const plannedSets = state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
+      for (let i = 0; i < plannedSets; i++) {
+        const prevSet = prevSets[i];
+        if (!prevSet || (!prevSet.weight && !prevSet.reps)) continue;
+
+        const row = document.getElementById(`row_${ex.id}_${i}`);
+        if (!row) continue;
+
+        const weightInput = row.querySelector('.set-input-weight');
+        const repsInput = row.querySelector('.set-input-reps');
+        const draftKey = `${session.id}_${ex.id}_${i}`;
+        if (!state.draft[draftKey]) state.draft[draftKey] = {};
+
+        if (weightInput && weightInput.value === '' && prevSet.weight !== undefined && prevSet.weight !== null) {
+          weightInput.value = prevSet.weight;
+          state.draft[draftKey].weight = prevSet.weight;
+        }
+        if (repsInput && repsInput.value === '' && prevSet.reps) {
+          repsInput.value = prevSet.reps;
+          state.draft[draftKey].reps = prevSet.reps;
+        }
+      }
+      saveDraft();
+    };
+  });
+
   document.querySelectorAll('.set-input').forEach(input => {
     input.oninput = (e) => {
       const exId = e.target.getAttribute('data-ex');
@@ -1262,6 +1360,7 @@ function attachExerciseCardListeners() {
         }
 
         if (exercise && exercise.restSeconds) {
+          requestRestNotificationPermission();
           const subData = state.substitutions && state.substitutions[exId];
           const timerName = (subData && subData.name) || exercise.name;
           startRestTimer(exercise.restSeconds, `${timerName} (Set ${setIdx + 1})`);
@@ -1531,6 +1630,8 @@ function setupGlobalListeners() {
         saveDraft();
         renderSession();
         playBeep(440, 0.15);
+        requestWakeLock();
+        requestRestNotificationPermission();
       } else {
         if (state.activeWorkoutSessionId && state.activeWorkoutSessionId !== state.currentSessionId) {
           const activeBtn = document.querySelector(`.tab-btn[data-session='${state.activeWorkoutSessionId}']`);
@@ -1783,6 +1884,7 @@ function finishWorkoutSession() {
   if (globalBanner) globalBanner.classList.add('hidden');
 
   stopRestTimer();
+  releaseWakeLock();
   renderSession();
   renderHistoryModal();
   playCompletionChime();
@@ -2461,12 +2563,21 @@ function registerServiceWorker() {
 window.ROUTINE_DATA = ROUTINE_DATA;
 window.state = state;
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.isWorkoutActive) {
+    requestWakeLock();
+  }
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   loadState();
   applyTheme();
   setupGlobalListeners();
   renderSession();
   registerServiceWorker();
+  if (state.isWorkoutActive) {
+    requestWakeLock();
+  }
 });
 
 })();
