@@ -370,7 +370,7 @@ def run_tests():
                       f"Custom title: '{custom_title}', Badge: '{custom_badge_text}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/15c_substitute_custom_hammer_strength.png")
 
-        # 5. Clean revert to baseline for downstream tests
+        # 5. Clean revert to baseline and verify custom substitute stays saved in the modal list
         page.locator("#card_flat_db_press .btn-restore-sub").click()
         page.wait_for_timeout(300)
         final_revert_title = page.locator("#card_flat_db_press .exercise-title").inner_text().strip()
@@ -378,6 +378,21 @@ def run_tests():
                       final_revert_title == "Flat Dumbbell Press",
                       f"Final title: '{final_revert_title}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/15d_substitute_clean_restore.png")
+
+        # 6. Verify custom substitute remains saved in the Substitutions modal after restoring
+        page.locator("button[data-accordion='flat_db_press']").click()
+        page.wait_for_timeout(200)
+        page.locator("[data-show-subs='flat_db_press']").click()
+        page.wait_for_timeout(300)
+        saved_custom_visible = page.locator(".sub-option-item:has-text('Incline Hammer Strength Press')").count() > 0
+        record_result("Exercise Substitution: Custom Substitute Persists in Saved List",
+                      saved_custom_visible,
+                      f"Saved custom visible after restore: {saved_custom_visible}")
+        # Clean up saved custom substitute via its delete button
+        page.locator(".sub-option-item:has-text('Incline Hammer Strength Press') .btn-sub-delete").click()
+        page.wait_for_timeout(200)
+        page.locator("#modalSubstitutions [data-close-modal]").click()
+        page.wait_for_timeout(200)
 
         # ---------------------------------------------------------
         # TEST 9: DDP Guide Modal
@@ -494,6 +509,15 @@ def run_tests():
         record_result("Overload Integrity: Restoring Original Exercise Restores Previa",
                       "30x8" in restored_previa_set1,
                       f"Restored Previa shows: '{restored_previa_set1}'")
+
+        # Verify persistent progression recommendation window appears based on previous value
+        prev_window = page.locator("[data-prev-progression='flat_db_press']")
+        prev_window_visible = prev_window.count() > 0 and prev_window.is_visible()
+        prev_window_text = prev_window.inner_text() if prev_window_visible else ""
+        prev_window_pass = prev_window_visible and ("INCREASE WEIGHT" in prev_window_text.upper()) and ("30 kg x 8 reps" in prev_window_text)
+        record_result("Persistent Progression Window: Shows Increase Weight From Previous Set 1",
+                      prev_window_pass,
+                      f"Visible: {prev_window_visible}, Text: '{prev_window_text.replace(chr(10), ' ')}'")
 
         # ---------------------------------------------------------
         # TEST 12: Additional Defect Investigations

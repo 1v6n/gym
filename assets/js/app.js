@@ -553,7 +553,9 @@ const STORAGE_KEYS = {
   LOGS: 'hypertrophy_ddp_logs_v2',
   SETTINGS: 'hypertrophy_ddp_settings_v2',
   ACTIVE_DRAFT: 'hypertrophy_ddp_active_draft_v2',
-  HISTORY: 'hypertrophy_ddp_history_v1'
+  HISTORY: 'hypertrophy_ddp_history_v1',
+  CUSTOM_SUBS: 'hypertrophy_ddp_custom_subs_v1',
+  ACTIVE_SUBS: 'hypertrophy_ddp_active_subs_v1'
 };
 
 const state = {
@@ -569,6 +571,7 @@ const state = {
   history: [],
   draft: {},
   substitutions: {},
+  customSubstitutions: {},
   audioCtx: null,
   timer: {
     interval: null,
@@ -684,13 +687,43 @@ function loadState() {
   }
 
   try {
+    const savedCustomSubs = localStorage.getItem(STORAGE_KEYS.CUSTOM_SUBS);
+    if (savedCustomSubs) {
+      const parsedCustom = JSON.parse(savedCustomSubs);
+      state.customSubstitutions = (parsedCustom && typeof parsedCustom === 'object' && !Array.isArray(parsedCustom)) ? parsedCustom : {};
+    } else {
+      state.customSubstitutions = {};
+    }
+  } catch (err) {
+    console.warn('Corrupted custom substitutions in storage, resetting:', err);
+    state.customSubstitutions = {};
+  }
+
+  let activeSubsLoaded = false;
+  try {
+    const savedActiveSubs = localStorage.getItem(STORAGE_KEYS.ACTIVE_SUBS);
+    if (savedActiveSubs) {
+      const parsedActive = JSON.parse(savedActiveSubs);
+      if (parsedActive && typeof parsedActive === 'object' && !Array.isArray(parsedActive)) {
+        state.substitutions = parsedActive;
+        activeSubsLoaded = true;
+      }
+    }
+  } catch (err) {
+    console.warn('Corrupted active substitutions in storage, resetting:', err);
+    state.substitutions = {};
+  }
+
+  try {
     const savedDraft = localStorage.getItem(STORAGE_KEYS.ACTIVE_DRAFT);
     if (savedDraft) {
       state.draft = JSON.parse(savedDraft);
-      if (state.draft && typeof state.draft.substitutions === 'object' && state.draft.substitutions !== null) {
-        state.substitutions = state.draft.substitutions;
-      } else {
-        state.substitutions = {};
+      if (!activeSubsLoaded) {
+        if (state.draft && typeof state.draft.substitutions === 'object' && state.draft.substitutions !== null) {
+          state.substitutions = state.draft.substitutions;
+        } else {
+          state.substitutions = {};
+        }
       }
       if (state.draft.isWorkoutActive) {
         state.isWorkoutActive = true;
@@ -698,13 +731,13 @@ function loadState() {
         state.workoutStartTime = state.draft.workoutStartTime || Date.now();
         state.currentSessionId = state.draft.currentSessionId || 'upperA';
       }
-    } else {
+    } else if (!activeSubsLoaded) {
       state.substitutions = {};
     }
   } catch (err) {
     console.warn('Corrupted active draft in storage, resetting draft:', err);
     state.draft = {};
-    state.substitutions = {};
+    if (!activeSubsLoaded) state.substitutions = {};
   }
 }
 
@@ -714,6 +747,14 @@ function saveLogs() {
 
 function saveHistory() {
   saveStorageItem(STORAGE_KEYS.HISTORY, state.history);
+}
+
+function saveCustomSubstitutions() {
+  saveStorageItem(STORAGE_KEYS.CUSTOM_SUBS, state.customSubstitutions);
+}
+
+function saveActiveSubstitutions() {
+  saveStorageItem(STORAGE_KEYS.ACTIVE_SUBS, state.substitutions);
 }
 
 function saveSettings() {
@@ -847,6 +888,79 @@ function evaluateDdpSet(exercise, setIndex, weight, reps, rir) {
   }
 }
 
+/**
+ * Find the most recent logged sets matching the exact active exercise name.
+ */
+function getMatchingPreviousSets(sessionId, exercise, currentExerciseName) {
+  const prevSessionData = state.logs[sessionId] || null;
+
+  if (prevSessionData && prevSessionData.exercises && prevSessionData.exercises[exercise.id]) {
+    const prevMeta = prevSessionData.exerciseLogs && prevSessionData.exerciseLogs[exercise.id];
+    const prevName = prevMeta ? prevMeta.exerciseName : exercise.name;
+    if (prevName === currentExerciseName) {
+      return prevSessionData.exercises[exercise.id];
+    }
+  }
+
+  if (Array.isArray(state.history)) {
+    for (const h of state.history) {
+      if (h.sessionId === sessionId && h.exercises && h.exercises[exercise.id]) {
+        const hMeta = h.exerciseLogs && h.exerciseLogs[exercise.id];
+        const hName = hMeta ? hMeta.exerciseName : exercise.name;
+        if (hName === currentExerciseName) {
+          return h.exercises[exercise.id];
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Build a persistent progression recommendation based on the previous session's Set 1.
+ */
+function getPreviousProgressionRecommendation(exercise, matchingPrevSets) {
+  if (!Array.isArray(matchingPrevSets) || matchingPrevSets.length === 0) return null;
+
+  const refSet = matchingPrevSets.find(s => s && parseInt(s.reps, 10) > 0) || null;
+  if (!refSet) return null;
+
+  const prevWeight = parseFloat(refSet.weight) || 0;
+  const prevReps = parseInt(refSet.reps, 10) || 0;
+  if (prevReps <= 0) return null;
+
+  const [minReps, maxReps] = exercise.targetReps;
+  const unit = state.weightUnit;
+
+  if (prevReps >= maxReps) {
+    if (prevWeight > 0) {
+      const minInc = (prevWeight * 0.025).toFixed(1);
+      const maxInc = (prevWeight * 0.05).toFixed(1);
+      const nextMin = (prevWeight * 1.025).toFixed(1);
+      const nextMax = (prevWeight * 1.05).toFixed(1);
+      return {
+        shouldIncrease: true,
+        badge: 'Increase weight',
+        message: `Prev Set 1: ${prevWeight} ${unit} x ${prevReps} reps (ceiling ${maxReps} hit). Add 2.5%–5% (+${minInc} to +${maxInc} ${unit} → ${nextMin}–${nextMax} ${unit}).`
+      };
+    }
+    return {
+      shouldIncrease: true,
+      badge: 'Increase load',
+      message: `Prev Set 1: ${prevReps} reps (ceiling ${maxReps} hit). Add external load today.`
+    };
+  }
+
+  const nextRepTarget = Math.min(maxReps, prevReps + 1);
+  const weightLabel = prevWeight > 0 ? `${prevWeight} ${unit}` : 'current load';
+  return {
+    shouldIncrease: false,
+    badge: 'Keep weight',
+    message: `Prev Set 1: ${prevWeight} ${unit} x ${prevReps} reps (below ${maxReps} ceiling). Stay at ${weightLabel} and push for ${nextRepTarget}–${maxReps} reps.`
+  };
+}
+
 // ============================================================================
 // 5. UI RENDERING
 // ============================================================================
@@ -900,8 +1014,6 @@ function renderSession() {
   if (!container) return;
   container.innerHTML = '';
 
-  const prevSessionData = state.logs[session.id] || null;
-
   session.exercises.forEach((exercise) => {
     const card = document.createElement('div');
     card.className = 'exercise-card';
@@ -916,36 +1028,14 @@ function renderSession() {
       : exercise.sets;
 
     const rirLabel = state.isDeloadMode ? '3 to 4 RIR' : exercise.targetRirLabel;
+    const matchingPrevSets = getMatchingPreviousSets(session.id, exercise, exerciseDisplayName);
+    const prevRecommendation = getPreviousProgressionRecommendation(exercise, matchingPrevSets);
 
     let rowsHtml = '';
     for (let i = 0; i < plannedSets; i++) {
       const setNum = i + 1;
       
       let prevText = '—';
-      const currentExerciseName = isSubstituted ? subData.name : exercise.name;
-      let matchingPrevSets = null;
-
-      if (prevSessionData && prevSessionData.exercises && prevSessionData.exercises[exercise.id]) {
-        const prevMeta = prevSessionData.exerciseLogs && prevSessionData.exerciseLogs[exercise.id];
-        const prevName = prevMeta ? prevMeta.exerciseName : exercise.name;
-        if (prevName === currentExerciseName) {
-          matchingPrevSets = prevSessionData.exercises[exercise.id];
-        }
-      }
-
-      if (!matchingPrevSets && Array.isArray(state.history)) {
-        for (const h of state.history) {
-          if (h.sessionId === session.id && h.exercises && h.exercises[exercise.id]) {
-            const hMeta = h.exerciseLogs && h.exerciseLogs[exercise.id];
-            const hName = hMeta ? hMeta.exerciseName : exercise.name;
-            if (hName === currentExerciseName) {
-              matchingPrevSets = h.exercises[exercise.id];
-              break;
-            }
-          }
-        }
-      }
-
       if (matchingPrevSets && matchingPrevSets[i]) {
         const prevSet = matchingPrevSets[i];
         if (prevSet && prevSet.weight !== undefined && prevSet.weight !== null && prevSet.reps) {
@@ -1025,6 +1115,15 @@ function renderSession() {
         ${exercise.technique ? `<p style="margin-top:var(--space-2xs);"><strong>Technical detail:</strong> ${exercise.technique.desc}</p>` : ''}
         <button type="button" class="drawer-sub-btn" data-show-subs="${exercise.id}">View equipment & machine substitutions</button>
       </div>
+
+      ${prevRecommendation ? `
+        <div class="prev-progression-window ${prevRecommendation.shouldIncrease ? 'prev-increase' : 'prev-keep'}" data-prev-progression="${exercise.id}" role="status">
+          <div class="prev-progression-header">
+            <span class="prev-progression-badge">${prevRecommendation.badge}</span>
+          </div>
+          <p class="prev-progression-msg">${prevRecommendation.message}</p>
+        </div>
+      ` : ''}
 
       <div class="sets-table">
         <div class="table-header">
@@ -1181,6 +1280,15 @@ function attachExerciseCardListeners() {
   });
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function substituteExercise(exerciseId, substituteName, isCustom = false) {
   if (!exerciseId || !substituteName) return;
   const cleanName = typeof substituteName === 'string' ? substituteName.trim() : String(substituteName);
@@ -1190,6 +1298,18 @@ function substituteExercise(exerciseId, substituteName, isCustom = false) {
     name: cleanName,
     isCustom: Boolean(isCustom)
   };
+  if (isCustom) {
+    if (!state.customSubstitutions) state.customSubstitutions = {};
+    const existing = Array.isArray(state.customSubstitutions[exerciseId])
+      ? state.customSubstitutions[exerciseId]
+      : [];
+    const alreadySaved = existing.some(item => item.toLowerCase() === cleanName.toLowerCase());
+    if (!alreadySaved) {
+      state.customSubstitutions[exerciseId] = [...existing, cleanName];
+      saveCustomSubstitutions();
+    }
+  }
+  saveActiveSubstitutions();
   saveDraft();
   renderSession();
   const modal = document.getElementById('modalSubstitutions');
@@ -1200,11 +1320,24 @@ function restoreOriginalExercise(exerciseId) {
   if (!exerciseId) return;
   if (state.substitutions && state.substitutions[exerciseId]) {
     delete state.substitutions[exerciseId];
+    saveActiveSubstitutions();
     saveDraft();
     renderSession();
   }
   const modal = document.getElementById('modalSubstitutions');
   if (modal) modal.classList.add('hidden');
+}
+
+function deleteCustomSubstitute(exerciseId, customName) {
+  if (!exerciseId || !customName || !state.customSubstitutions) return;
+  const existing = state.customSubstitutions[exerciseId];
+  if (!Array.isArray(existing)) return;
+  state.customSubstitutions[exerciseId] = existing.filter(name => name !== customName);
+  if (state.customSubstitutions[exerciseId].length === 0) {
+    delete state.customSubstitutions[exerciseId];
+  }
+  saveCustomSubstitutions();
+  openSubstitutionsModal(exerciseId);
 }
 
 function openSubstitutionsModal(exerciseId) {
@@ -1233,8 +1366,8 @@ function openSubstitutionsModal(exerciseId) {
         <div class="sub-active-banner">
           <div class="sub-active-info">
             <span class="sub-active-label">Currently substituting:</span>
-            <strong class="sub-active-orig">${ex.name}</strong>
-            <span class="sub-active-name">Current: ${subData.name}</span>
+            <strong class="sub-active-orig">${escapeHtml(ex.name)}</strong>
+            <span class="sub-active-name">Current: ${escapeHtml(subData.name)}</span>
           </div>
           <button type="button" class="btn-restore-prominent" id="btnRestoreProminent" aria-label="Restore original exercise">
             ↺ Restore original exercise
@@ -1252,21 +1385,42 @@ function openSubstitutionsModal(exerciseId) {
       <ul class="sub-options-list">
     `;
 
-    const alternatives = Array.isArray(ex.substitutions) ? ex.substitutions : [];
-    if (alternatives.length === 0) {
+    const predefined = Array.isArray(ex.substitutions) ? ex.substitutions : [];
+    const customList = (state.customSubstitutions && Array.isArray(state.customSubstitutions[exerciseId]))
+      ? state.customSubstitutions[exerciseId]
+      : [];
+    const combinedAlternatives = [
+      ...predefined.map(name => ({ name, isCustom: false })),
+      ...customList
+        .filter(name => !predefined.some(p => p.toLowerCase() === name.toLowerCase()))
+        .map(name => ({ name, isCustom: true }))
+    ];
+
+    if (combinedAlternatives.length === 0) {
       html += `<li class="sub-empty">No predefined substitutes for this exercise.</li>`;
     } else {
-      alternatives.forEach((sub, idx) => {
-        const isThisActive = isCurrentlySubbed && subData.name === sub;
+      combinedAlternatives.forEach((item, idx) => {
+        const isThisActive = isCurrentlySubbed && subData.name === item.name;
+        const safeName = escapeHtml(item.name);
         html += `
           <li class="sub-option-item ${isThisActive ? 'is-active' : ''}" data-sub-idx="${idx}">
             <div class="sub-option-text">
-              <strong class="sub-option-name">${sub}</strong>
-              ${isThisActive ? '<span class="sub-active-chip">In use</span>' : ''}
+              <strong class="sub-option-name">${safeName}</strong>
+              <div class="sub-option-chips">
+                ${item.isCustom ? '<span class="sub-custom-chip">Saved custom</span>' : ''}
+                ${isThisActive ? '<span class="sub-active-chip">In use</span>' : ''}
+              </div>
             </div>
-            <button type="button" class="btn-sub-select" data-sub-idx="${idx}" aria-label="Use substitute ${sub}">
-              Use this substitute
-            </button>
+            <div class="sub-option-actions">
+              <button type="button" class="btn-sub-select" data-sub-idx="${idx}" aria-label="Use substitute ${safeName}">
+                Use this substitute
+              </button>
+              ${item.isCustom ? `
+                <button type="button" class="btn-sub-delete" data-delete-custom-idx="${idx}" title="Delete saved custom exercise" aria-label="Delete custom substitute ${safeName}">
+                  ✕
+                </button>
+              ` : ''}
+            </div>
           </li>
         `;
       });
@@ -1296,12 +1450,13 @@ function openSubstitutionsModal(exerciseId) {
 
     body.querySelectorAll('.sub-option-item').forEach(item => {
       const idx = parseInt(item.getAttribute('data-sub-idx'), 10);
-      const selectedSub = alternatives[idx];
+      const selected = combinedAlternatives[idx];
       const btn = item.querySelector('.btn-sub-select');
+      const deleteBtn = item.querySelector('.btn-sub-delete');
 
       const chooseSub = () => {
-        if (selectedSub) {
-          substituteExercise(exerciseId, selectedSub, false);
+        if (selected) {
+          substituteExercise(exerciseId, selected.name, selected.isCustom);
         }
       };
 
@@ -1309,6 +1464,14 @@ function openSubstitutionsModal(exerciseId) {
         btn.onclick = (e) => {
           e.stopPropagation();
           chooseSub();
+        };
+      }
+      if (deleteBtn) {
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (selected && selected.isCustom) {
+            deleteCustomSubstitute(exerciseId, selected.name);
+          }
         };
       }
       item.onclick = () => {
@@ -1607,7 +1770,7 @@ function finishWorkoutSession() {
   state.activeWorkoutSessionId = null;
   state.workoutStartTime = null;
   state.draft = {};
-  state.substitutions = {};
+  saveActiveSubstitutions();
   saveDraft();
 
   const globalBanner = document.getElementById('ddpBanner');
@@ -2202,6 +2365,8 @@ function exportJsonBackup() {
     timestamp: Date.now(),
     history: state.history,
     logs: state.logs,
+    customSubstitutions: state.customSubstitutions,
+    substitutions: state.substitutions,
     settings: {
       weightUnit: state.weightUnit,
       isDeloadMode: state.isDeloadMode,
@@ -2233,6 +2398,14 @@ function importJsonBackup(event) {
       if (imported.logs) {
         state.logs = imported.logs;
         saveLogs();
+      }
+      if (imported.customSubstitutions && typeof imported.customSubstitutions === 'object' && !Array.isArray(imported.customSubstitutions)) {
+        state.customSubstitutions = imported.customSubstitutions;
+        saveCustomSubstitutions();
+      }
+      if (imported.substitutions && typeof imported.substitutions === 'object' && !Array.isArray(imported.substitutions)) {
+        state.substitutions = imported.substitutions;
+        saveActiveSubstitutions();
       }
       if (imported.settings) {
         state.weightUnit = imported.settings.weightUnit || 'kg';
