@@ -530,8 +530,8 @@
 }
 
 .accordion-chevron {
-  width: 7px;
-  height: 7px;
+  width: var(--space-xs);
+  height: var(--space-xs);
   border-right: var(--rule-hair) solid currentColor;
   border-bottom: var(--rule-hair) solid currentColor;
   transform: rotate(45deg);
@@ -695,8 +695,8 @@
 /* An empty box reads as a broken input: show a quiet check while the set is open. */
 .set-row:not(.completed) .set-check-btn::before {
   content: "";
-  width: 10px;
-  height: 5px;
+  width: calc(var(--space-xs) + var(--space-3xs));
+  height: calc(var(--space-2xs) + var(--rule-hair));
   border-left: var(--rule-hair) solid currentColor;
   border-bottom: var(--rule-hair) solid currentColor;
   transform: rotate(-45deg) translateY(-2px);
@@ -773,7 +773,38 @@
 .prev-progression-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-xs);
+}
+
+.btn-fill-prev {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-size);
+  min-width: var(--control-size);
+  padding: 0 var(--space-sm);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  border: var(--rule-hair) solid var(--color-rule-strong);
+  border-radius: var(--radius-inner);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+
+.btn-fill-prev:hover {
+  background: var(--color-paper-4);
+  border-color: var(--color-rule-focus);
+}
+
+.btn-fill-prev:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .prev-progression-badge {
@@ -1085,10 +1116,10 @@
 .slider:before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
-  left: 3px;
-  bottom: 3px;
+  height: calc(var(--space-md) + var(--space-2xs));
+  width: calc(var(--space-md) + var(--space-2xs));
+  left: calc(var(--space-3xs) + var(--rule-hair));
+  bottom: calc(var(--space-3xs) + var(--rule-hair));
   background-color: var(--color-ink);
   transition: transform var(--dur-micro) var(--ease-out);
   border-radius: 50%;
@@ -1104,7 +1135,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(20px);
+  transform: translateX(calc(var(--space-md) + var(--space-2xs)));
   background-color: var(--color-accent-ink);
 }
 
