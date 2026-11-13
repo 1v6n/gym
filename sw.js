@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hypertrophy-ddp-v17';
+const CACHE_NAME = 'hypertrophy-ddp-v18';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

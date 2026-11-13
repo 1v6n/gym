@@ -1431,7 +1431,7 @@ function openSubstitutionsModal(exerciseId) {
       <div class="sub-custom-card">
         <label for="inputCustomSub" class="sub-custom-label">Or enter a custom machine/exercise:</label>
         <div class="sub-custom-input-group">
-          <input type="text" id="inputCustomSub" class="sub-custom-input" placeholder="Or enter a custom machine/exercise" aria-label="Custom substitute name" autocomplete="off">
+          <input type="text" id="inputCustomSub" class="sub-custom-input" placeholder="e.g. Chest Press Machine" aria-label="Custom substitute name" autocomplete="off">
           <button type="button" id="btnApplyCustomSub" class="btn-apply-sub">Apply</button>
         </div>
       </div>
@@ -1614,6 +1614,12 @@ function setupGlobalListeners() {
         modal.classList.add('hidden');
       }
     };
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+    }
   });
 
   const btnUnitKg = document.getElementById('btnUnitKg');
@@ -2095,9 +2101,12 @@ function generateProgressionSvg(points, metricKey, unit) {
 
   coords.forEach(c => {
     const isSelected = state.progression?.selectedPointIndex === c.index;
+    const axisDate = c.point.timestamp
+      ? new Date(c.point.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : String(c.point.date || '').replace(/^[^,]+,\s*/, '').slice(0, 6);
     svg += `
       <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${isSelected ? 7 : 5}" fill="var(--color-paper-2)" stroke="${isSelected ? 'var(--color-light)' : 'var(--color-accent)'}" stroke-width="${isSelected ? 3.5 : 2.5}" />
-      <text x="${c.x.toFixed(1)}" y="${(padding.top + plotH + 20).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--color-muted)" font-family="var(--font-body)">${c.point.date.slice(0, 5)}</text>
+      <text x="${c.x.toFixed(1)}" y="${(padding.top + plotH + 20).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--color-muted)" font-family="var(--font-body)">${axisDate}</text>
       <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="24" fill="transparent" class="chart-hit-circle" data-chart-index="${c.index}" aria-label="Point ${c.point.date}: ${c.point[metricKey]} ${unit}" />
     `;
   });
@@ -2144,7 +2153,7 @@ function renderProgressionView() {
 
   exercises.forEach(ex => {
     const pointsCount = getExerciseHistoryData(ex.id).length;
-    const badge = pointsCount > 0 ? ` (${pointsCount} workouts)` : '';
+    const badge = pointsCount > 0 ? ` (${pointsCount} ${pointsCount === 1 ? 'workout' : 'workouts'})` : '';
     const selected = ex.id === state.progression.exerciseId ? 'selected' : '';
     html += `<option value="${ex.id}" ${selected}>${ex.name}${badge}</option>`;
   });
