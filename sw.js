@@ -1,9 +1,13 @@
-const CACHE_NAME = 'hypertrophy-ddp-v24';
+const CACHE_NAME = 'hypertrophy-ddp-v25';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './assets/icons/icon.svg',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-maskable-512.png',
+  './assets/icons/apple-touch-icon.png',
   './assets/css/styles.css',
   './assets/css/tokens.css',
   './assets/css/base.css',
