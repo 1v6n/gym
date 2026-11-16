@@ -572,6 +572,8 @@ const state = {
   draft: {},
   substitutions: {},
   customSubstitutions: {},
+  expandedCompletedExercises: new Set(),
+  toastTimeout: null,
   audioCtx: null,
   wakeLockSentinel: null,
   timer: {
@@ -580,6 +582,7 @@ const state = {
     remainingSeconds: 0,
     totalSeconds: 0,
     isPaused: false,
+    overtimeNotified: false,
     exerciseTitle: ''
   },
   progression: {
@@ -850,13 +853,16 @@ function startRestTimer(seconds, exerciseName = 'Rest') {
   state.timer.totalSeconds = seconds;
   state.timer.remainingSeconds = seconds;
   state.timer.isPaused = false;
+  state.timer.overtimeNotified = false;
   state.timer.exerciseTitle = exerciseName;
 
   const bar = document.getElementById('restTimerBar');
   const label = document.getElementById('timerExerciseLabel');
   const toggleIcon = document.getElementById('timerToggleIcon');
 
-  if (bar) bar.classList.remove('hidden');
+  if (bar) {
+    bar.classList.remove('hidden', 'is-overtime');
+  }
   if (label) label.textContent = exerciseName;
   if (toggleIcon) {
     toggleIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
@@ -867,18 +873,13 @@ function startRestTimer(seconds, exerciseName = 'Rest') {
   state.timer.interval = setInterval(() => {
     if (!state.timer.isPaused) {
       state.timer.remainingSeconds--;
-      updateTimerUI();
-
-      if (state.timer.remainingSeconds <= 0) {
-        clearInterval(state.timer.interval);
+      if (state.timer.remainingSeconds <= 0 && !state.timer.overtimeNotified) {
+        state.timer.overtimeNotified = true;
         playCompletionChime();
         sendRestCompleteNotification(exerciseName);
-        if (bar) {
-          state.timer.hideTimeout = setTimeout(() => {
-            bar.classList.add('hidden');
-          }, 3000);
-        }
+        if (bar) bar.classList.add('is-overtime');
       }
+      updateTimerUI();
     }
   }, 1000);
 }
@@ -886,14 +887,18 @@ function startRestTimer(seconds, exerciseName = 'Rest') {
 function updateTimerUI() {
   const clock = document.getElementById('timerClock');
   const progress = document.getElementById('timerProgressBar');
+  const isOvertime = state.timer.remainingSeconds < 0;
+  const displaySeconds = isOvertime ? Math.abs(state.timer.remainingSeconds) : state.timer.remainingSeconds;
 
-  const mins = Math.floor(Math.max(0, state.timer.remainingSeconds) / 60);
-  const secs = Math.max(0, state.timer.remainingSeconds) % 60;
-  const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  const mins = Math.floor(displaySeconds / 60);
+  const secs = displaySeconds % 60;
+  const formatted = `${isOvertime ? '+' : ''}${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
   if (clock) clock.textContent = formatted;
   if (progress && state.timer.totalSeconds > 0) {
-    const pct = Math.max(0, Math.min(100, (state.timer.remainingSeconds / state.timer.totalSeconds) * 100));
+    const pct = isOvertime
+      ? 100
+      : Math.max(0, Math.min(100, (state.timer.remainingSeconds / state.timer.totalSeconds) * 100));
     progress.style.transform = `scaleX(${pct / 100})`;
   }
 }
@@ -901,8 +906,12 @@ function updateTimerUI() {
 function stopRestTimer() {
   clearInterval(state.timer.interval);
   clearTimeout(state.timer.hideTimeout);
+  state.timer.overtimeNotified = false;
   const bar = document.getElementById('restTimerBar');
-  if (bar) bar.classList.add('hidden');
+  if (bar) {
+    bar.classList.add('hidden');
+    bar.classList.remove('is-overtime');
+  }
 }
 
 // ============================================================================
@@ -1016,6 +1025,33 @@ function getPreviousProgressionRecommendation(exercise, matchingPrevSets) {
 // 5. UI RENDERING
 // ============================================================================
 
+function getSessionSetProgress(session) {
+  let totalSets = 0;
+  let completedSets = 0;
+  session.exercises.forEach(ex => {
+    const plannedSets = state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
+    totalSets += plannedSets;
+    for (let i = 0; i < plannedSets; i++) {
+      const draftKey = `${session.id}_${ex.id}_${i}`;
+      if (state.draft && state.draft[draftKey] && state.draft[draftKey].done) {
+        completedSets++;
+      }
+    }
+  });
+  return { totalSets, completedSets };
+}
+
+function updateSessionProgressPill() {
+  const session = ROUTINE_DATA[state.currentSessionId];
+  const totalSetsEl = document.getElementById('totalSetsCount');
+  if (!session || !totalSetsEl) return;
+
+  const { totalSets, completedSets } = getSessionSetProgress(session);
+  const showFraction = state.isWorkoutActive || completedSets > 0;
+  totalSetsEl.textContent = showFraction ? `${completedSets}/${totalSets} sets` : `${totalSets} sets`;
+  totalSetsEl.classList.toggle('is-progress', showFraction);
+}
+
 function renderSession() {
   const session = ROUTINE_DATA[state.currentSessionId];
   if (!session) return;
@@ -1055,11 +1091,7 @@ function renderSession() {
     }
   }
 
-  let totalSets = 0;
-  session.exercises.forEach(ex => {
-    totalSets += state.isDeloadMode ? Math.max(1, Math.round(ex.sets * 0.5)) : ex.sets;
-  });
-  if (totalSetsEl) totalSetsEl.textContent = `${totalSets} sets`;
+  updateSessionProgressPill();
 
   const container = document.getElementById('exercisesList');
   if (!container) return;
@@ -1083,6 +1115,7 @@ function renderSession() {
     const prevRecommendation = getPreviousProgressionRecommendation(exercise, matchingPrevSets);
 
     let rowsHtml = '';
+    let exCompletedCount = 0;
     for (let i = 0; i < plannedSets; i++) {
       const setNum = i + 1;
       
@@ -1104,11 +1137,16 @@ function renderSession() {
       const valReps = draftData.reps !== undefined ? draftData.reps : '';
       const valRir = draftData.rir !== undefined ? draftData.rir : (state.isDeloadMode ? '3' : Math.round(exercise.targetRir));
       const isCompleted = !!draftData.done;
+      if (isCompleted) exCompletedCount++;
+
+      const prevCellHtml = prevText !== '—'
+        ? `<button type="button" class="set-col-prev set-col-prev-btn" data-copy-prev="${exercise.id}" data-set="${i}" title="Tap to fill ${prevText}" aria-label="Copy previous ${prevText} to set ${setNum}">${prevText}</button>`
+        : `<div class="set-col-prev" title="Previous">${prevText}</div>`;
 
       rowsHtml += `
         <div class="set-row ${isCompleted ? 'completed' : ''}" id="row_${exercise.id}_${i}">
           <div class="set-col-num">${setNum}</div>
-          <div class="set-col-prev" title="Previous">${prevText}</div>
+          ${prevCellHtml}
           <div>
             <input type="number" step="0.5" inputmode="decimal" class="set-input set-input-weight" 
                    data-ex="${exercise.id}" data-set="${i}" placeholder="${weightPlaceholder}" 
@@ -1134,10 +1172,21 @@ function renderSession() {
       `;
     }
 
+    const isAllCompleted = exCompletedCount === plannedSets && plannedSets > 0;
+    const isCollapsed = isAllCompleted && !state.expandedCompletedExercises.has(exercise.id);
+    if (isCollapsed) {
+      card.classList.add('is-completed-collapsed');
+    }
+
     card.innerHTML = `
       <div class="exercise-header">
         <div class="exercise-top-row">
           <div class="exercise-title">${exerciseDisplayName}</div>
+          ${isAllCompleted ? `
+            <button type="button" class="btn-collapse-toggle" data-toggle-collapse="${exercise.id}" aria-expanded="${isCollapsed ? 'false' : 'true'}">
+              ✓ ${exCompletedCount}/${plannedSets} · ${isCollapsed ? 'Expand' : 'Collapse'}
+            </button>
+          ` : ''}
           ${isSubstituted ? `
             <button type="button" class="btn-restore-sub" data-restore-sub="${exercise.id}" title="Restore original exercise" aria-label="Restore original exercise">
               ↺ Restore
@@ -1310,6 +1359,54 @@ function attachExerciseCardListeners() {
     };
   });
 
+  document.querySelectorAll('[data-copy-prev]').forEach(btn => {
+    btn.onclick = () => {
+      const exId = btn.getAttribute('data-copy-prev');
+      const setIdx = parseInt(btn.getAttribute('data-set'), 10);
+      const session = ROUTINE_DATA[state.currentSessionId];
+      const ex = session?.exercises.find(e => e.id === exId);
+      if (!ex || Number.isNaN(setIdx)) return;
+
+      const subData = state.substitutions && state.substitutions[ex.id];
+      const currentName = (subData && subData.name) ? subData.name : ex.name;
+      const prevSets = getMatchingPreviousSets(session.id, ex, currentName);
+      const prevSet = Array.isArray(prevSets) ? prevSets[setIdx] : null;
+      if (!prevSet) return;
+
+      const row = document.getElementById(`row_${ex.id}_${setIdx}`);
+      if (!row) return;
+      const weightInput = row.querySelector('.set-input-weight');
+      const repsInput = row.querySelector('.set-input-reps');
+      const draftKey = `${session.id}_${ex.id}_${setIdx}`;
+      if (!state.draft[draftKey]) state.draft[draftKey] = {};
+
+      if (weightInput && prevSet.weight !== undefined && prevSet.weight !== null) {
+        weightInput.value = prevSet.weight;
+        state.draft[draftKey].weight = prevSet.weight;
+      }
+      if (repsInput && prevSet.reps) {
+        repsInput.value = prevSet.reps;
+        state.draft[draftKey].reps = prevSet.reps;
+      }
+      saveDraft();
+    };
+  });
+
+  document.querySelectorAll('[data-toggle-collapse]').forEach(btn => {
+    btn.onclick = () => {
+      const exId = btn.getAttribute('data-toggle-collapse');
+      const card = document.getElementById(`card_${exId}`);
+      if (!exId || !card) return;
+      const currentlyCollapsed = card.classList.contains('is-completed-collapsed');
+      if (currentlyCollapsed) {
+        state.expandedCompletedExercises.add(exId);
+      } else {
+        state.expandedCompletedExercises.delete(exId);
+      }
+      renderSession();
+    };
+  });
+
   document.querySelectorAll('.set-input').forEach(input => {
     input.oninput = (e) => {
       const exId = e.target.getAttribute('data-ex');
@@ -1325,6 +1422,54 @@ function attachExerciseCardListeners() {
         state.draft[draftKey].rir = e.target.value;
       }
       saveDraft();
+    };
+  });
+
+  document.querySelectorAll('[data-copy-prev]').forEach(btn => {
+    btn.onclick = () => {
+      const exId = btn.getAttribute('data-copy-prev');
+      const setIdx = parseInt(btn.getAttribute('data-set'), 10);
+      const session = ROUTINE_DATA[state.currentSessionId];
+      const ex = session?.exercises.find(e => e.id === exId);
+      if (!ex || Number.isNaN(setIdx)) return;
+
+      const subData = state.substitutions && state.substitutions[ex.id];
+      const currentName = (subData && subData.name) ? subData.name : ex.name;
+      const prevSets = getMatchingPreviousSets(session.id, ex, currentName);
+      const prevSet = Array.isArray(prevSets) ? prevSets[setIdx] : null;
+      if (!prevSet) return;
+
+      const row = document.getElementById(`row_${ex.id}_${setIdx}`);
+      if (!row) return;
+      const weightInput = row.querySelector('.set-input-weight');
+      const repsInput = row.querySelector('.set-input-reps');
+      const draftKey = `${session.id}_${ex.id}_${setIdx}`;
+      if (!state.draft[draftKey]) state.draft[draftKey] = {};
+
+      if (weightInput && prevSet.weight !== undefined && prevSet.weight !== null) {
+        weightInput.value = prevSet.weight;
+        state.draft[draftKey].weight = prevSet.weight;
+      }
+      if (repsInput && prevSet.reps) {
+        repsInput.value = prevSet.reps;
+        state.draft[draftKey].reps = prevSet.reps;
+      }
+      saveDraft();
+    };
+  });
+
+  document.querySelectorAll('[data-toggle-collapse]').forEach(btn => {
+    btn.onclick = () => {
+      const exId = btn.getAttribute('data-toggle-collapse');
+      const card = document.getElementById(`card_${exId}`);
+      if (!exId || !card) return;
+      const currentlyCollapsed = card.classList.contains('is-completed-collapsed');
+      if (currentlyCollapsed) {
+        state.expandedCompletedExercises.add(exId);
+      } else {
+        state.expandedCompletedExercises.delete(exId);
+      }
+      renderSession();
     };
   });
 
@@ -1350,6 +1495,7 @@ function attachExerciseCardListeners() {
       state.draft[draftKey].rir = rirVal;
 
       saveDraft();
+      updateSessionProgressPill();
 
       if (isDone) {
         row.classList.add('completed');
@@ -1374,6 +1520,47 @@ function attachExerciseCardListeners() {
         if (setIdx === 0) {
           const globalBanner = document.getElementById('ddpBanner');
           if (globalBanner) globalBanner.classList.add('hidden');
+        }
+      }
+
+      if (exercise) {
+        const plannedSets = state.isDeloadMode ? Math.max(1, Math.round(exercise.sets * 0.5)) : exercise.sets;
+        let exCompleted = 0;
+        for (let i = 0; i < plannedSets; i++) {
+          const k = `${state.currentSessionId}_${exId}_${i}`;
+          if (state.draft && state.draft[k] && state.draft[k].done) exCompleted++;
+        }
+        const allDone = exCompleted === plannedSets && plannedSets > 0;
+        if (!allDone) state.expandedCompletedExercises.delete(exId);
+        const card = document.getElementById(`card_${exId}`);
+        if (card) {
+          const existingToggle = card.querySelector(`[data-toggle-collapse="${exId}"]`);
+          if (allDone && !existingToggle) {
+            const topRow = card.querySelector('.exercise-top-row');
+            const isCollapsed = !state.expandedCompletedExercises.has(exId);
+            card.classList.toggle('is-completed-collapsed', isCollapsed);
+            if (topRow) {
+              const toggleBtn = document.createElement('button');
+              toggleBtn.type = 'button';
+              toggleBtn.className = 'btn-collapse-toggle';
+              toggleBtn.setAttribute('data-toggle-collapse', exId);
+              toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+              toggleBtn.textContent = `✓ ${exCompleted}/${plannedSets} · ${isCollapsed ? 'Expand' : 'Collapse'}`;
+              toggleBtn.onclick = () => {
+                if (card.classList.contains('is-completed-collapsed')) {
+                  state.expandedCompletedExercises.add(exId);
+                } else {
+                  state.expandedCompletedExercises.delete(exId);
+                }
+                renderSession();
+              };
+              const titleEl = topRow.querySelector('.exercise-title');
+              if (titleEl) titleEl.after(toggleBtn);
+            }
+          } else if (!allDone && existingToggle) {
+            card.classList.remove('is-completed-collapsed');
+            existingToggle.remove();
+          }
         }
       }
     };
@@ -1405,6 +1592,52 @@ function closeModal(dialog) {
   } else {
     dialog.removeAttribute('open');
   }
+}
+
+function showToast(message) {
+  const toast = document.getElementById('appToast');
+  if (!toast || !message) return;
+  clearTimeout(state.toastTimeout);
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  state.toastTimeout = setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 2600);
+}
+
+function showConfirmDialog({ title = 'Confirm action', message = '', confirmLabel = 'Confirm', destructive = false } = {}) {
+  const dialog = document.getElementById('modalConfirm');
+  const titleEl = document.getElementById('confirmModalTitle');
+  const msgEl = document.getElementById('confirmModalMessage');
+  const btnCancel = document.getElementById('btnConfirmCancel');
+  const btnAccept = document.getElementById('btnConfirmAccept');
+
+  if (!dialog || !btnCancel || !btnAccept) {
+    return Promise.resolve(false);
+  }
+
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.textContent = message;
+  btnAccept.textContent = confirmLabel;
+  btnAccept.className = destructive ? 'btn-outline btn-danger-outline' : 'btn-primary';
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      dialog.removeEventListener('close', onClose);
+      btnCancel.onclick = null;
+      btnAccept.onclick = null;
+      closeModal(dialog);
+      resolve(result);
+    };
+    const onClose = () => finish(false);
+    dialog.addEventListener('close', onClose);
+    btnCancel.onclick = () => finish(false);
+    btnAccept.onclick = () => finish(true);
+    openModal(dialog);
+  });
 }
 
 function substituteExercise(exerciseId, substituteName, isCustom = false) {
@@ -1641,7 +1874,7 @@ function setupGlobalListeners() {
 
   const btnToggleWorkout = document.getElementById('btnToggleWorkout');
   if (btnToggleWorkout) {
-    btnToggleWorkout.onclick = () => {
+    btnToggleWorkout.onclick = async () => {
       if (!state.isWorkoutActive) {
         state.isWorkoutActive = true;
         state.activeWorkoutSessionId = state.currentSessionId;
@@ -1657,7 +1890,11 @@ function setupGlobalListeners() {
           if (activeBtn) activeBtn.click();
           return;
         }
-        const confirmed = confirm('Do you want to finish and save this workout to your history?');
+        const confirmed = await showConfirmDialog({
+          title: 'Finish workout',
+          message: 'Save this workout session to your history?',
+          confirmLabel: 'Finish & save'
+        });
         if (confirmed) {
           finishWorkoutSession();
         }
@@ -1673,15 +1910,27 @@ function setupGlobalListeners() {
 
   if (btnTimerMinus) {
     btnTimerMinus.onclick = () => {
-      state.timer.remainingSeconds = Math.max(5, state.timer.remainingSeconds - 30);
+      if (state.timer.remainingSeconds <= 0) {
+        state.timer.remainingSeconds = 0;
+      } else {
+        state.timer.remainingSeconds = Math.max(5, state.timer.remainingSeconds - 30);
+      }
       updateTimerUI();
     };
   }
 
   if (btnTimerPlus) {
     btnTimerPlus.onclick = () => {
-      state.timer.remainingSeconds += 30;
-      state.timer.totalSeconds += 30;
+      if (state.timer.remainingSeconds <= 0) {
+        state.timer.remainingSeconds = 30;
+        state.timer.totalSeconds = Math.max(state.timer.totalSeconds, 30);
+        state.timer.overtimeNotified = false;
+        const bar = document.getElementById('restTimerBar');
+        if (bar) bar.classList.remove('is-overtime');
+      } else {
+        state.timer.remainingSeconds += 30;
+        state.timer.totalSeconds += 30;
+      }
       updateTimerUI();
     };
   }
@@ -1819,8 +2068,14 @@ function setupGlobalListeners() {
 
   const btnResetHistory = document.getElementById('btnResetHistory');
   if (btnResetHistory) {
-    btnResetHistory.onclick = () => {
-      if (confirm('Are you sure you want to clear your saved workout history?')) {
+    btnResetHistory.onclick = async () => {
+      const confirmed = await showConfirmDialog({
+        title: 'Clear saved history',
+        message: 'Delete all saved workouts and progression logs? This cannot be undone.',
+        confirmLabel: 'Clear history',
+        destructive: true
+      });
+      if (confirmed) {
         state.logs = {};
         state.history = [];
         state.draft = {};
@@ -1830,7 +2085,7 @@ function setupGlobalListeners() {
         saveDraft();
         renderSession();
         renderHistoryModal();
-        alert('Saved history cleared.');
+        showToast('Saved history cleared.');
       }
     };
   }
@@ -1906,7 +2161,7 @@ function finishWorkoutSession() {
   renderHistoryModal();
   playCompletionChime();
 
-  alert(`${session.name} workout finished and recorded.`);
+  showToast(`${session.name} workout finished and recorded.`);
 }
 
 function setupHistoryTabs() {
@@ -2426,7 +2681,7 @@ function exportSingleHistoryMarkdown(id) {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(md).then(() => {
-      alert('Workout summary copied to clipboard.');
+      showToast('Workout summary copied to clipboard.');
     }).catch(() => {
       prompt('Copy Markdown summary:', md);
     });
@@ -2435,11 +2690,18 @@ function exportSingleHistoryMarkdown(id) {
   }
 }
 
-function deleteHistoryEntry(id) {
-  if (confirm('Are you sure you want to delete this workout from your history?')) {
+async function deleteHistoryEntry(id) {
+  const confirmed = await showConfirmDialog({
+    title: 'Delete workout',
+    message: 'Remove this workout from your history?',
+    confirmLabel: 'Delete',
+    destructive: true
+  });
+  if (confirmed) {
     state.history = state.history.filter(h => h.id !== id);
     saveHistory();
     renderHistoryModal();
+    showToast('Workout deleted.');
   }
 }
 
@@ -2478,7 +2740,7 @@ function exportWorkoutMarkdown() {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(md).then(() => {
-      alert('Session summary copied to clipboard in Markdown format.');
+      showToast('Session summary copied to clipboard.');
     }).catch(() => {
       prompt('Copy Markdown summary:', md);
     });
@@ -2546,9 +2808,9 @@ function importJsonBackup(event) {
       }
       renderSession();
       renderHistoryModal();
-      alert('Backup restored successfully.');
+      showToast('Backup restored successfully.');
     } catch (err) {
-      alert('Error parsing JSON backup file.');
+      showToast('Error parsing JSON backup file.');
       console.error(err);
     }
   };
