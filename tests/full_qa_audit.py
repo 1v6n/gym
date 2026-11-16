@@ -189,8 +189,8 @@ def run_full_qa():
         page.wait_for_timeout(150)
         page.keyboard.press("Escape")
         page.wait_for_timeout(150)
-        esc_closed = "hidden" in (page.locator("#modalSettings").get_attribute("class") or "")
-        record("Escape Key Closes Modal", esc_closed, f"Settings hidden: {esc_closed}")
+        esc_closed = page.locator("#modalSettings").get_attribute("open") is None
+        record("Escape Key Closes Modal", esc_closed, f"Settings closed: {esc_closed}")
 
         # 8. Console / Page / Network Error Check
         record("Zero Console Errors", len(console_errors) == 0, str(console_errors))

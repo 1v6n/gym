@@ -85,7 +85,7 @@ async def run_qa():
             const hiddenByAttr = getComputedStyle(probeAttr).display === 'none';
             probeAttr.remove();
 
-            const openOverlays = [...document.querySelectorAll('.modal-overlay')]
+            const openOverlays = [...document.querySelectorAll('dialog.modal-dialog')]
                 .filter(el => getComputedStyle(el).display !== 'none')
                 .map(el => el.id);
 
@@ -270,7 +270,7 @@ async def run_qa():
         # 4d. Open Substitutions Modal from Accordion Drawer
         print("\n--- Testing Substitutions Modal ---")
         await page.locator("[data-show-subs='flat_db_press']").click()
-        await page.wait_for_selector("#modalSubstitutions:not(.hidden)")
+        await page.wait_for_selector("#modalSubstitutions[open]")
         sub_title = await page.locator("#subModalTitle").text_content()
         sub_items = await page.locator("#subModalBody li").all_text_contents()
         results["modals"]["substitutions"] = {
@@ -288,7 +288,7 @@ async def run_qa():
         # 4e. Open DDP Guide Modal
         print("\n--- Testing DDP Guide Modal ---")
         await page.locator("#btnQuickNotes").click()
-        await page.wait_for_selector("#modalGuide:not(.hidden)")
+        await page.wait_for_selector("#modalGuide[open]")
         guide_title = await page.locator("#modalGuide h3").text_content()
         guide_h4s = await page.locator("#modalGuide h4").all_text_contents()
         results["modals"]["ddp_guide"] = {
@@ -305,7 +305,7 @@ async def run_qa():
         # 4f. Open Settings & Tools Modal
         print("\n--- Testing Settings & Tools Modal ---")
         await page.locator("#btnSettings").click()
-        await page.wait_for_selector("#modalSettings:not(.hidden)")
+        await page.wait_for_selector("#modalSettings[open]")
         await page.screenshot(path=f"{SCREENSHOTS_DIR}/04_modal_settings_iphone.png", full_page=False)
         print(f"Captured: {SCREENSHOTS_DIR}/04_modal_settings_iphone.png")
 

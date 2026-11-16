@@ -579,10 +579,10 @@ def run_tests():
         # Test 31: Open History Modal on button click
         page.locator("#btnHistory").click()
         page.wait_for_timeout(300)
-        history_modal_visible = not ("hidden" in (page.locator("#modalHistory").get_attribute("class") or ""))
+        history_modal_visible = page.locator("#modalHistory").get_attribute("open") is not None
         record_result("Workout History: Modal Opens on Button Click",
                       history_modal_visible,
-                      f"Modal classes: {page.locator('#modalHistory').get_attribute('class')}")
+                      f"Modal open attr: {page.locator('#modalHistory').get_attribute('open')}")
         page.screenshot(path=f"{SCREENSHOT_DIR}/24_history_modal_open.png")
 
         # Test 32: Verify session logged in Test 11 appears in History List

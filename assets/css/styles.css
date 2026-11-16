@@ -986,14 +986,27 @@
    MODALS
    ========================================================================== */
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  background: var(--color-overlay);
+dialog.modal-dialog {
+  margin: auto auto 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  width: 100%;
+  max-width: var(--ledger-mobile-width);
+  max-height: 85vh;
+  color: var(--color-ink);
+  overscroll-behavior: contain;
+}
+
+dialog.modal-dialog[open] {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+}
+
+dialog.modal-dialog::backdrop {
+  background: var(--color-overlay);
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .modal-card {

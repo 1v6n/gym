@@ -146,11 +146,11 @@
     </div>
 
     <!-- Workout History Modal -->
-    <div id="modalHistory" class="modal-overlay hidden">
+    <dialog id="modalHistory" class="modal-dialog" closedby="any" aria-labelledby="historyModalTitle">
       <div class="modal-card modal-card-wide">
         <div class="modal-header">
-          <h3>History & Analytics</h3>
-          <button class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
+          <h3 id="historyModalTitle">History & Analytics</h3>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
         </div>
         <div class="history-tab-nav" role="tablist" aria-label="History views">
           <button id="tabHistorySessions" class="history-tab-btn active" role="tab" aria-selected="true" aria-controls="historySessionsView">
@@ -169,14 +169,14 @@
           </div>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- Settings & Tools Modal -->
-    <div id="modalSettings" class="modal-overlay hidden">
+    <dialog id="modalSettings" class="modal-dialog" closedby="any" aria-labelledby="settingsModalTitle">
       <div class="modal-card">
         <div class="modal-header">
-          <h3>Settings & Tools</h3>
-          <button class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
+          <h3 id="settingsModalTitle">Settings & Tools</h3>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="setting-item">
@@ -244,14 +244,14 @@
           </div>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- DDP & Principles Guide Modal -->
-    <div id="modalGuide" class="modal-overlay hidden">
+    <dialog id="modalGuide" class="modal-dialog" closedby="any" aria-labelledby="guideModalTitle">
       <div class="modal-card">
         <div class="modal-header">
-          <h3>Overload Engine (DDP)</h3>
-          <button class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
+          <h3 id="guideModalTitle">Overload Engine (DDP)</h3>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
         </div>
         <div class="modal-body modal-guide-text">
           <h4>1. Dynamic Double Progression</h4>
@@ -271,20 +271,20 @@
           </ul>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- Substitutions Modal -->
-    <div id="modalSubstitutions" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="subModalTitle">
+    <dialog id="modalSubstitutions" class="modal-dialog" closedby="any" aria-labelledby="subModalTitle">
       <div class="modal-card">
         <div class="modal-header">
           <h3 id="subModalTitle">Exercise Substitutions</h3>
-          <button class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
         </div>
         <div class="modal-body" id="subModalBody">
           <!-- Dynamic Content -->
         </div>
       </div>
-    </div>
+    </dialog>
 
   </div>
 
