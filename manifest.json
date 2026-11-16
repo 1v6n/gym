@@ -2,7 +2,7 @@
   "name": "Hypertrophy DDP - Evidence-Based Workout Tracker",
   "short_name": "Hypertrophy",
   "description": "Evidence-based 4-day Upper/Lower hypertrophy tracker with Dynamic Double Progression and Rest Timer",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#010102",

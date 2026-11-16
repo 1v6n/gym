@@ -1,7 +1,6 @@
-const CACHE_NAME = 'hypertrophy-ddp-v27';
+const CACHE_NAME = 'hypertrophy-ddp-v28';
 const ASSETS_TO_CACHE = [
   './',
-  './index.html',
   './manifest.json',
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
@@ -45,23 +44,22 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
+      if (cachedResponse && !(event.request.mode === 'navigate' && cachedResponse.redirected)) {
+        return cachedResponse;
+      }
 
-      return fetch(event.request)
-        .then((networkResponse) => {
-          if (event.request.mode === 'navigate' && !networkResponse.ok) {
-            return caches.match('./index.html', { ignoreSearch: true })
-              .then((fallback) => fallback || networkResponse);
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html', { ignoreSearch: true })
-              .then((fallback) => fallback || caches.match('./') || Response.error());
-          }
-          return Response.error();
-        });
+      if (event.request.mode === 'navigate') {
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (!networkResponse.ok) {
+              return caches.match('./').then((fallback) => fallback || networkResponse);
+            }
+            return networkResponse;
+          })
+          .catch(() => caches.match('./').then((fallback) => fallback || Response.error()));
+      }
+
+      return fetch(event.request).catch(() => Response.error());
     })
   );
 });
