@@ -448,7 +448,7 @@ def run_tests():
         deload_pass = ("Deload active" in deload_status) and \
                       ("3 to 4 RIR" in first_card_rir) and \
                       ("2 sets" in first_card_bracket) and \
-                      (deload_sets_count == "12 sets")
+                      ("12 sets" in deload_sets_count)
         record_result("Deload Mode Activation (50% volume, 3 to 4 RIR)", deload_pass,
                       f"Deload Status: '{deload_status}', Total sets: '{deload_sets_count}', First exercise: '{first_card_bracket}', RIR: '{first_card_rir}'")
         page.screenshot(path=f"{SCREENSHOT_DIR}/19_deload_mode_active.png")
@@ -470,6 +470,7 @@ def run_tests():
         # ---------------------------------------------------------
         # Click Finalizar sesion
         page.locator("#btnToggleWorkout").click()
+        page.locator("#btnConfirmAccept").click()
         page.wait_for_timeout(500)
 
         # After finishing workout, check button reverts to "Start workout"
@@ -645,6 +646,7 @@ def run_tests():
 
         # Test 38: Delete history entry
         page.locator(".btn-history-delete").first.click()
+        page.locator("#btnConfirmAccept").click()
         page.wait_for_timeout(300)
         cards_after_delete = page.locator(".history-card").count()
         empty_visible = page.locator(".history-empty").count() > 0
@@ -664,11 +666,13 @@ def run_tests():
         # Clear any dangling active workout from previous test investigations if present
         if page.evaluate("() => Boolean(state.isWorkoutActive)"):
             page.locator("#btnToggleWorkout").click()
+            page.locator("#btnConfirmAccept").click()
             page.wait_for_timeout(400)
             page.locator("#btnHistory").click()
             page.wait_for_timeout(300)
             if page.locator(".btn-history-delete").count() > 0:
                 page.locator(".btn-history-delete").first.click()
+                page.locator("#btnConfirmAccept").click()
                 page.wait_for_timeout(300)
             page.locator("#modalHistory [data-close-modal]").click()
             page.wait_for_timeout(200)
@@ -695,6 +699,7 @@ def run_tests():
 
         # Finish workout
         page.locator("#btnToggleWorkout").click()
+        page.locator("#btnConfirmAccept").click()
         page.wait_for_timeout(400)
 
         # Open History modal and verify substituted exercise name is displayed
@@ -714,6 +719,7 @@ def run_tests():
 
         # Clean up history entry
         page.locator(".btn-history-delete").first.click()
+        page.locator("#btnConfirmAccept").click()
         page.wait_for_timeout(300)
         page.locator("#modalHistory [data-close-modal]").click()
         page.wait_for_timeout(200)

@@ -2180,3 +2180,96 @@ body { min-height: 100dvh; }
   .summary-metrics { margin-top: var(--space-sm); }
   .exercises-container { padding-inline: var(--space-lg); gap: var(--space-lg); }
 }
+
+/* ==========================================================================
+   UI/UX ENHANCEMENTS: COLLAPSE, PREV COPY, OVERTIME, CONFIRM & TOAST
+   ========================================================================== */
+
+.exercise-card.is-completed-collapsed .sets-table,
+.exercise-card.is-completed-collapsed .prev-progression-window {
+  display: none;
+}
+
+.btn-collapse-toggle {
+  min-height: var(--control-size);
+  padding: 0 var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-success);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-collapse-toggle:hover {
+  background: var(--color-shade);
+}
+
+.set-col-prev-btn {
+  width: 100%;
+  min-height: var(--control-size);
+  padding: 0 var(--space-2xs);
+  border: none;
+  border-radius: var(--radius-inner);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  text-align: center;
+}
+
+.set-col-prev-btn:hover {
+  background: var(--color-shade);
+  color: var(--color-ink);
+}
+
+.metric-pill.is-progress {
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-bar.is-overtime .timer-clock {
+  color: var(--color-warn);
+}
+
+.timer-bar.is-overtime .timer-progress-bar {
+  background: var(--color-warn);
+}
+
+.confirm-message {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.confirm-actions > button {
+  min-height: var(--control-size);
+  padding-inline: var(--space-md);
+}
+
+.app-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: var(--z-modal);
+  max-width: min(calc(100vw - var(--space-xl)), var(--ledger-mobile-width));
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  border: var(--rule-hair) solid var(--color-rule-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-align: center;
+}

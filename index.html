@@ -286,6 +286,26 @@
       </div>
     </dialog>
 
+    <!-- In-App Confirmation Dialog -->
+    <dialog id="modalConfirm" class="modal-dialog modal-confirm" closedby="any" aria-labelledby="confirmModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="confirmModalTitle">Confirm action</h3>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmModalMessage" class="confirm-message"></p>
+          <div class="confirm-actions">
+            <button type="button" id="btnConfirmCancel" class="btn-outline" autofocus>Cancel</button>
+            <button type="button" id="btnConfirmAccept" class="btn-primary">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Non-blocking Toast -->
+    <div id="appToast" class="app-toast hidden" role="status" aria-live="polite"></div>
+
   </div>
 
   <script src="./assets/js/app.js"></script>

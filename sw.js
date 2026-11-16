@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hypertrophy-ddp-v28';
+const CACHE_NAME = 'hypertrophy-ddp-v31';
 const ASSETS_TO_CACHE = [
   './',
   './manifest.json',
