@@ -1389,6 +1389,24 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+function openModal(dialog) {
+  if (!dialog) return;
+  if (typeof dialog.showModal === 'function') {
+    if (!dialog.open) dialog.showModal();
+  } else {
+    dialog.setAttribute('open', '');
+  }
+}
+
+function closeModal(dialog) {
+  if (!dialog) return;
+  if (typeof dialog.close === 'function') {
+    if (dialog.open) dialog.close();
+  } else {
+    dialog.removeAttribute('open');
+  }
+}
+
 function substituteExercise(exerciseId, substituteName, isCustom = false) {
   if (!exerciseId || !substituteName) return;
   const cleanName = typeof substituteName === 'string' ? substituteName.trim() : String(substituteName);
@@ -1413,7 +1431,7 @@ function substituteExercise(exerciseId, substituteName, isCustom = false) {
   saveDraft();
   renderSession();
   const modal = document.getElementById('modalSubstitutions');
-  if (modal) modal.classList.add('hidden');
+  closeModal(modal);
 }
 
 function restoreOriginalExercise(exerciseId) {
@@ -1425,7 +1443,7 @@ function restoreOriginalExercise(exerciseId) {
     renderSession();
   }
   const modal = document.getElementById('modalSubstitutions');
-  if (modal) modal.classList.add('hidden');
+  closeModal(modal);
 }
 
 function deleteCustomSubstitute(exerciseId, customName) {
@@ -1593,7 +1611,7 @@ function openSubstitutionsModal(exerciseId) {
     }
     if (inputCustom) {
       inputCustom.onkeydown = (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) {
           e.preventDefault();
           handleApplyCustom();
         }
@@ -1601,7 +1619,7 @@ function openSubstitutionsModal(exerciseId) {
     }
   }
 
-  if (modal) modal.classList.remove('hidden');
+  openModal(modal);
 }
 
 // ============================================================================
@@ -1695,34 +1713,32 @@ function setupGlobalListeners() {
   const btnSettings = document.getElementById('btnSettings');
   const modalSettings = document.getElementById('modalSettings');
   if (btnSettings && modalSettings) {
-    btnSettings.onclick = () => modalSettings.classList.remove('hidden');
+    btnSettings.onclick = () => openModal(modalSettings);
   }
 
   const btnQuickNotes = document.getElementById('btnQuickNotes');
   const modalGuide = document.getElementById('modalGuide');
   if (btnQuickNotes && modalGuide) {
-    btnQuickNotes.onclick = () => modalGuide.classList.remove('hidden');
+    btnQuickNotes.onclick = () => openModal(modalGuide);
   }
 
   document.querySelectorAll('[data-close-modal]').forEach(btn => {
     btn.onclick = () => {
-      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+      closeModal(btn.closest('dialog'));
     };
   });
 
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.onclick = (e) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-      }
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    const outside = (e, dialog) => {
+      const r = dialog.getBoundingClientRect();
+      return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
     };
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
-    }
-  });
+    document.querySelectorAll('dialog.modal-dialog[closedby="any"]').forEach(dialog => {
+      let pressedOutside = false;
+      dialog.addEventListener('pointerdown', (e) => { pressedOutside = outside(e, dialog); });
+      dialog.addEventListener('pointerup', (e) => { if (pressedOutside && outside(e, dialog)) closeModal(dialog); });
+    });
+  }
 
   const btnUnitKg = document.getElementById('btnUnitKg');
   const themeSelect = document.getElementById('themeSelect');
@@ -1787,7 +1803,7 @@ function setupGlobalListeners() {
   if (btnHistory && modalHistory) {
     btnHistory.onclick = () => {
       renderHistoryModal();
-      modalHistory.classList.remove('hidden');
+      openModal(modalHistory);
     };
   }
   setupHistoryTabs();
