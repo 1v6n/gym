@@ -735,7 +735,7 @@ function loadState() {
       state.weightUnit = parsed.weightUnit || 'kg';
       state.isDeloadMode = !!parsed.isDeloadMode;
       state.audioVibrate = parsed.audioVibrate !== false;
-      state.theme = ['light', 'dark'].includes(parsed.theme) ? parsed.theme : 'system';
+      state.theme = ['light', 'dark', 'pixel'].includes(parsed.theme) ? parsed.theme : 'system';
     }
   } catch (err) {
     console.warn('Corrupted settings in storage, using defaults:', err);
@@ -829,6 +829,12 @@ function applyTheme() {
   }
   const select = document.getElementById('themeSelect');
   if (select) select.value = state.theme;
+  const logoEl = document.querySelector('.app-logo');
+  if (logoEl) {
+    logoEl.innerHTML = state.theme === 'pixel'
+      ? '<svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="5" width="2" height="6"/><rect x="3" y="3" width="2" height="10"/><rect x="5" y="7" width="6" height="2"/><rect x="11" y="3" width="2" height="10"/><rect x="13" y="5" width="2" height="6"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>';
+  }
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
 }
