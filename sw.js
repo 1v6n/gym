@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hypertrophy-ddp-v26';
+const CACHE_NAME = 'hypertrophy-ddp-v27';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -39,14 +39,29 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Fallback to cache index.html if navigation fails
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(event.request)
+        .then((networkResponse) => {
+          if (event.request.mode === 'navigate' && !networkResponse.ok) {
+            return caches.match('./index.html', { ignoreSearch: true })
+              .then((fallback) => fallback || networkResponse);
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html', { ignoreSearch: true })
+              .then((fallback) => fallback || caches.match('./') || Response.error());
+          }
+          return Response.error();
+        });
     })
   );
 });
