@@ -2273,38 +2273,3 @@ body { min-height: 100dvh; }
   font-weight: 500;
   text-align: center;
 }
-
-/* ==========================================================================
-   PIXEL (8-BIT) THEME OVERRIDES
-   ========================================================================== */
-
-:root[data-theme="pixel"] .exercise-card,
-:root[data-theme="pixel"] .session-summary-card,
-:root[data-theme="pixel"] .modal-card,
-:root[data-theme="pixel"] .timer-bar,
-:root[data-theme="pixel"] .app-toast {
-  border-width: 2px;
-  border-color: var(--color-rule-strong);
-}
-
-:root[data-theme="pixel"] .btn-primary,
-:root[data-theme="pixel"] .btn-secondary,
-:root[data-theme="pixel"] .btn-outline,
-:root[data-theme="pixel"] .tab-btn.active {
-  border-width: 2px;
-  box-shadow: var(--shadow-pixel);
-}
-
-:root[data-theme="pixel"] .btn-primary:active,
-:root[data-theme="pixel"] .btn-secondary:active,
-:root[data-theme="pixel"] .btn-outline:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
-}
-
-:root[data-theme="pixel"] .set-input,
-:root[data-theme="pixel"] .set-check-btn,
-:root[data-theme="pixel"] .icon-btn,
-:root[data-theme="pixel"] .timer-btn {
-  border-width: 2px;
-}

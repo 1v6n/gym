@@ -1,9 +1,8 @@
-const CACHE_NAME = 'hypertrophy-ddp-v32';
+const CACHE_NAME = 'hypertrophy-ddp-v31';
 const ASSETS_TO_CACHE = [
   './',
   './manifest.json',
   './assets/icons/icon.svg',
-  './assets/icons/icon-pixel.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/icon-maskable-512.png',
